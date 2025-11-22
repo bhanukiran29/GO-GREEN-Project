@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Plants & Seeds</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            background: #e8f8e4;
+            font-family: Poppins, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1b4332;
+            font-size: 40px;
+            margin-top: 30px;
+        }
+
+        .subcat-container {
+            width: 90%;
+            margin: auto;
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 35px;
+        }
+
+        .subcat-card {
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.3s ease;
+            text-align: center;
+        }
+
+        .subcat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .subcat-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .subcat-card h2 {
+            padding: 15px;
+            font-size: 24px;
+            color: #1b4332;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🌱 Soil & Fertilizers</h1>
+
+    <div class="subcat-container">
+
+        <div class="subcat-card" onclick="location.href='organic-soil.html'">
+            <img src="img/indoor-category.jpg">
+            <h2>Organic Soil</h2>
+        </div>
+
+        <div class="subcat-card" onclick="location.href='coco-peat.html'">
+            <img src="img/outdoor-category.jpg">
+            <h2>Coco Peat</h2>
+        </div>
+
+        <div class="subcat-card" onclick="location.href='vermicompost.html'">
+            <img src="img/vermicompost-category.jpg">
+            <h2>Vermicompost</h2>
+        </div>
+
+        <div class="subcat-card" onclick="location.href='Fertilizers.html'">
+            <img src="img/fertilizers-category.jpg">
+            <h2>Fertilizers</h2>
+        </div>
+
+    </div>
+
+</body>
+</html>

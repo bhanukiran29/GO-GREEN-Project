@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Delivery Details</title>
+<style>
+    body {
+        background: #e6ffe6;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 600px;
+        background: white;
+        padding: 25px;
+        margin: auto;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        color: #1b4332;
+        margin-bottom: 20px;
+    }
+
+    label {
+        font-weight: bold;
+        color: #2d6a4f;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0 20px 0;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 16px;
+    }
+
+    button {
+        background: #1b4332;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        width: 100%;
+        font-size: 18px;
+    }
+
+    button:hover {
+        background: #14532d;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Delivery Details</h2>
+
+    <form id="addressForm">
+
+        <label>Full Name</label>
+        <input type="text" id="fullName" required>
+
+        <label>Phone Number</label>
+        <input type="tel" id="phone" required>
+
+        <label>State</label>
+        <input type="text" id="state" required>
+
+        <label>District</label>
+        <input type="text" id="district" required>
+
+        <label>City</label>
+        <input type="text" id="city" required>
+
+        <label>Street Name</label>
+        <input type="text" id="street" required>
+
+        <label>Pincode</label>
+        <input type="number" id="pincode" required>
+
+        <button type="submit">Submit & Place Order</button>
+    </form>
+</div>
+
+<script>
+document.getElementById("addressForm").addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const address = {
+        fullName: document.getElementById("fullName").value,
+        phone: document.getElementById("phone").value,
+        state: document.getElementById("state").value,
+        district: document.getElementById("district").value,
+        city: document.getElementById("city").value,
+        street: document.getElementById("street").value,
+        pincode: document.getElementById("pincode").value
+    };
+
+    localStorage.setItem("addressDetails", JSON.stringify(address));
+
+    // redirect to success page
+    window.location.href = "order-success.html";
+});
+</script>
+
+</body>
+</html>

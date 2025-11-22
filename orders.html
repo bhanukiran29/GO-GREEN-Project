@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My Orders</title>
+<style>
+    body {
+        background: #e6ffe6;
+        font-family: Arial, sans-serif;
+        padding: 40px;
+    }
+
+    .orders-box {
+        background: white;
+        padding: 30px;
+        max-width: 1000px;
+        margin: auto;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        color: #1b4332;
+        font-size: 32px;
+    }
+
+    .order-card {
+        border-bottom: 1px solid #ccc;
+        padding: 20px 0;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .order-card img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        background: #eee;
+    }
+
+    .order-details {
+        flex-grow: 1;
+    }
+
+    .order-date {
+        color: #2d6a4f;
+        font-size: 14px;
+        margin-top: 4px;
+    }
+
+    .empty {
+        color: #666;
+        text-align: center;
+        padding: 30px;
+        font-size: 18px;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #1b4332;
+        color: white;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 16px;
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+
+<div class="orders-box">
+    <h1>My Orders</h1>
+    <div id="ordersContainer"></div>
+    <a href="index.html" class="btn">Back to Home</a>
+</div>
+
+<script>
+function loadOrders() {
+    const ordersContainer = document.getElementById("ordersContainer");
+    const orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+    if (orders.length === 0) {
+        ordersContainer.innerHTML = `<p class="empty">No orders found.</p>`;
+        return;
+    }
+
+    ordersContainer.innerHTML = "";
+
+    orders.reverse().forEach(order => {
+        order.items.forEach(item => {
+            const card = document.createElement("div");
+            card.className = "order-card";
+
+            card.innerHTML = `
+                <img src="${item.img}" alt="Product Image">
+                <div class="order-details">
+                    <strong>${item.name}</strong><br>
+                    ₹${item.price} × ${item.quantity} = <strong>₹${item.price * item.quantity}</strong>
+                    <div class="order-date">Ordered on: ${order.date}</div>
+                </div>
+            `;
+
+            ordersContainer.appendChild(card);
+        });
+    });
+}
+
+loadOrders();
+</script>
+
+</body>
+</html>

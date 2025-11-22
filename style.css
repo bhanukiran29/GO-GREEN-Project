@@ -1,0 +1,456 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  font-family: Poppins;
+  background: #E8F5E9;
+}
+
+/* CAROUSEL FIX: full width + 40vh
+   ============================= */
+
+/* enforce carousel container and slides height */
+#myCarousel,
+#myCarousel .carousel-inner,
+#myCarousel .item {
+  height: 60vh !important;
+  /* 60% of viewport height */
+}
+
+/* ensure image fills its slide */
+#myCarousel .carousel-img {
+  width: 100%;
+  height: 100% !important;
+  /* fill the parent .item */
+  object-fit: cover !important;
+  /* crop as needed */
+  display: block;
+}
+
+/* ensure bootstrap's default slide positioning doesn't break this */
+#myCarousel .item {
+  position: relative;
+  display: block;
+}
+
+/* ENSURE BOOTSTRAP SHOW/HIDE BEHAVIOR (safe, non-destructive) */
+#myCarousel .item {
+  display: none;
+  /* hide non-active slides */
+  position: relative;
+  /* keep normal carousel positioning */
+  height: 60vh !important;
+  /* match desired height */
+}
+
+#myCarousel .item.active {
+  display: block;
+  /* only active slide visible */
+}
+
+/* ensure image fills slide */
+#myCarousel .carousel-img {
+  width: 100%;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block;
+}
+
+/* Optional: nicer indicators and controls */
+.carousel-indicators {
+  bottom: 10px;
+}
+
+.carousel-indicators li {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  border: none;
+}
+
+.carousel-indicators .active {
+  background: #fff;
+}
+
+.carousel-control.left,
+.carousel-control.right {
+  width: 6%;
+  background-image: none !important;
+}
+
+.carousel-control .glyphicon {
+  font-size: 34px;
+  color: #fff;
+  text-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+}
+
+/* end carousal */
+
+/* ======================================================
+   navigation bar styles
+   ====================================================== */
+
+.custom-navbar {
+  background: #d8f3dc;
+  /* soft light green */
+  height: 90px;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Logo */
+.logo-img {
+  height: 70px;
+  border-radius: 5px;
+}
+
+/* Location box */
+.location-box {
+  display: flex;
+  align-items: center;
+  background: #b7e4c7;
+  border: 2px solid #40916c;
+  /* darker green border */
+  border-radius: 8px;
+  padding: 8px 14px;
+  color: #1b4332;
+  margin-right: 25px;
+}
+
+.loc-icon {
+  font-size: 18px;
+  margin-right: 10px;
+  color: #1b4332;
+}
+
+.loc-text small {
+  font-size: 11px;
+  color: #2d6a4f;
+}
+
+.loc-text strong {
+  font-size: 14px;
+  color: #1b4332;
+}
+
+/* Location Dropdown */
+.location-dropdown {
+  margin-left: 20px;
+}
+
+.location-btn {
+  background: #b7e4c7;
+  border: 2px solid #40916c;
+  color: #1b4332;
+  font-size: 15px;
+  border-radius: 8px;
+  padding: 8px 15px;
+}
+
+.location-btn:hover {
+  background: #95d5b2;
+}
+
+.location-menu li a {
+  color: #1b4332 !important;
+}
+
+.location-menu li a:hover {
+  background: #d8f3dc !important;
+}
+
+
+/* Search bar */
+.search-area {
+  width: 40%;
+  margin: 0 25px;
+}
+
+.search-box {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.search-icon {
+  background: #ffffff;
+  border: none;
+  color: #40916c;
+  /* green icon */
+  font-size: 18px;
+}
+
+.search-input {
+  height: 45px;
+  font-size: 18px;
+  /* larger text */
+  color: black !important;
+  border: none;
+  outline: none;
+}
+
+/* Right Menu */
+.navbar-links>li>a {
+  color: #1b4332 !important;
+  font-size: 19px;
+  font-weight: 500;
+  padding: 25px 15px !important;
+}
+
+.navbar-links .glyphicon {
+  margin-right: 6px;
+  font-size: 18px;
+}
+
+.navbar-links>li>a:hover {
+  background: #95d5b2 !important;
+  color: #1b4332 !important;
+}
+
+
+/* end navigation bar styles */
+
+/* User avatar in navbar */
+.avatar-circle {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  border-radius: 50%;
+  background: #2f6f4e;
+  /* darker green */
+  color: #fff;
+  text-align: center;
+  font-weight: 600;
+  margin-right: 6px;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.avatar-circle-lg {
+  display: inline-block;
+  width: 56px;
+  height: 56px;
+  line-height: 56px;
+  border-radius: 50%;
+  background: #2f6f4e;
+  color: #fff;
+  text-align: center;
+  font-weight: 600;
+  margin-right: 12px;
+  font-size: 22px;
+  vertical-align: middle;
+}
+
+/* user dropdown header */
+.user-dropdown {
+  min-width: 240px;
+  border-radius: 6px;
+  padding: 6px 0;
+}
+
+.user-header .user-meta {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+}
+
+.user-info {
+  line-height: 1.0;
+}
+
+.user-info strong {
+  font-size: 15px;
+  color: #1b4332;
+}
+
+.user-info small {
+  color: #2d6a4f;
+}
+
+/* dropdown link styles */
+.user-dropdown>li>a {
+  color: #1b4332 !important;
+}
+
+.user-dropdown>li>a:hover {
+  background: #e6f4ea !important;
+}
+
+/* make the dropdown look slightly darker */
+.dropdown-menu-right.user-dropdown {
+  background: #f6fffa;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/*------------------------------------------------------
+   Footer styles
+   ====================================================== */
+
+/* Centered Footer */
+.site-footer {
+  background: #d8f3dc;
+  /* same light green as navbar theme */
+  padding: 20px 0;
+  text-align: center;
+  font-size: 18px;
+  color: #1b4332;
+  margin-top: 40px;
+  border-top: 2px solid #95d5b2;
+}
+
+/*------------------------------------------------------
+   Category Section Styles
+   ====================================================== */
+
+/* Section Title */
+.section-title {
+  text-align: center;
+  font-size: 36px;
+  margin-top: 50px;
+  margin-bottom: 30px;
+  color: #1b4332;
+}
+
+/* Category Grid */
+.category-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  width: 90%;
+  margin: auto;
+}
+
+/* Category Card */
+.category-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+  text-align: center;
+}
+
+.category-card img {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+}
+
+.category-card h3 {
+  padding: 15px 0;
+  font-size: 20px;
+  color: #1b4332;
+  font-weight: 600;
+}
+
+.category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+
+/*------------------------------------------------------
+   Cart Page Styles
+   ====================================================== */
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.cart-details {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.cart-details img {
+  width: 70px;
+  height: 70px;
+  border-radius: 10px;
+}
+
+.qty-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.qty-controls button {
+  padding: 5px 10px;
+  background: #0a5;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.remove-btn {
+  background: crimson;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+}
+
+/* ======================================================
+   Animations
+   ====================================================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+body {
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+.category-card {
+  animation: slideUp 0.8s ease-out;
+}
+
+.modal-content {
+  animation: slideUp 0.4s ease-out;
+}
+
+.list-group-item {
+  animation: slideUp 0.5s ease-out;
+}

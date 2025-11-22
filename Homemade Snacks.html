@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Homemade Snacks</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            background: #e8f8e4;
+            font-family: Poppins, sans-serif;
+        }
+
+        .container {
+            width: 90%;
+            margin: auto;
+            margin-top: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1b4332;
+            font-size: 38px;
+            margin-bottom: 30px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            padding-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+            transition: .3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .product-card h3 {
+            margin-top: 10px;
+            color: #1b4332;
+            font-size: 18px;
+        }
+
+        .product-card p {
+            color: green;
+            font-weight: 600;
+        }
+
+        .btn-box {
+            margin-top: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: none;
+        }
+
+        .cart-btn {
+            background: #1b4332;
+            color: white;
+        }
+
+        .cart-btn:hover {
+            background: #145c32;
+        }
+
+        .buy-btn {
+            background: #2d6a4f;
+            color: white;
+        }
+
+        .buy-btn:hover {
+            background: #1a4b35;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Homemade Snacks</h1>
+
+        <div class="product-grid">
+
+            <!-- PRODUCT 1 -->
+            <div class="product-card">
+                <img src="i221.jpg">
+                <h3>Ragi Cookies (100g)</h3>
+                <p>₹120</p>
+
+                <div class="btn-box">
+                    <button class="btn cart-btn" onclick="addToCart('Ragi Cookies (100g)',120,'i221.jpg')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('Ragi Cookies (100g)',120,'i221.jpg')">Buy Now</button>
+                </div>
+            </div>
+
+            <!-- PRODUCT 2 -->
+            <div class="product-card">
+                <img src="i222.jpg">
+                <h3>Banana Chips (100g)</h3>
+                <p>₹99</p>
+
+                <div class="btn-box">
+                    <button class="btn cart-btn" onclick="addToCart('Banana Chips (100g)',99,'i222.jpg')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('Banana Chips (100g)',99,'i222.jpg')">Buy Now</button>
+                </div>
+            </div>
+
+            <!-- PRODUCT 3 -->
+            <div class="product-card">
+                <img src="i223.jpg">
+                <h3>Masala Makhana (70g)</h3>
+                <p>₹149</p>
+
+                <div class="btn-box">
+                    <button class="btn cart-btn" onclick="addToCart('Masala Makhana (70g)',149,'i223.jpg')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('Masala Makhana (70g)',149,'i223.jpg')">Buy Now</button>
+                </div>
+            </div>
+
+            <!-- PRODUCT 4 -->
+            <div class="product-card">
+                <img src="i224.jpg">
+                <h3>Peanut Chikki (80g)</h3>
+                <p>₹60</p>
+
+                <div class="btn-box">
+                    <button class="btn cart-btn" onclick="addToCart('Peanut Chikki (80g)',60,'i224.jpg')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('Peanut Chikki (80g)',60,'i224.jpg')">Buy Now</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    
+<script src="script.js"></script>
+
+<script>
+function buyNow(name, price, img) {
+    // Save only this 1 product for direct purchase
+    const directOrder = [{
+        name: name,
+        price: price,
+        img: img,
+        quantity: 1
+    }];
+
+    // Save to localStorage
+    localStorage.setItem("directBuyItem", JSON.stringify(directOrder));
+
+    // Redirect to checkout form (order form page)
+    window.location.href = "order-form.html";
+}
+
+
+
+
+        
+</script>
+
+</body>
+</html>

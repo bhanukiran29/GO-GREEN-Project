@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Order Successful</title>
+<style>
+    body {
+        background: #e6ffe6;
+        font-family: Arial, sans-serif;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .box {
+        background: white;
+        padding: 40px;
+        max-width: 600px;
+        margin: auto;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        color: #1b4332;
+    }
+
+    p {
+        font-size: 18px;
+        color: #2d6a4f;
+    }
+
+    button {
+        margin-top: 20px;
+        padding: 12px 20px;
+        background: #1b4332;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+    button:hover {
+        background: #14532d;
+    }
+</style>
+</head>
+<body>
+
+<div class="box">
+    <h1>🎉 Order Placed Successfully!</h1>
+    <p>Thank you for shopping with us.</p>
+    <p>Your items will be delivered soon.</p>
+
+    <button onclick="goHome()">Go to Home</button>
+</div>
+
+<script>
+function goHome() {
+    // Clear cart
+    localStorage.removeItem("cart");
+    localStorage.removeItem("checkoutItems");
+
+    window.location.href = "index.html";
+}
+
+window.onload = function () {
+    // Load checkout items
+    const items = JSON.parse(localStorage.getItem("checkoutItems")) || [];
+
+    // Load address
+    const address = JSON.parse(localStorage.getItem("addressDetails")) || {};
+
+    if (items.length === 0) return;
+
+    // Create an order object
+    const newOrder = {
+        id: Date.now(),
+        items: items,
+        address: address,
+        date: new Date().toLocaleString()
+    };
+
+    // Get existing order list
+    const orderList = JSON.parse(localStorage.getItem("orders")) || [];
+
+    // Add this new order to order list
+    orderList.push(newOrder);
+
+    // Save to localStorage
+    localStorage.setItem("orders", JSON.stringify(orderList));
+
+    // Clear checkout data
+    localStorage.removeItem("checkoutItems");
+    localStorage.removeItem("addressDetails");
+};
+</script>
+
+
+</body>
+</html>

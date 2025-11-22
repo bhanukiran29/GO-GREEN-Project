@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Your Cart</title>
+    <style>
+        body {
+            background: #dffbe1;
+            font-family: Poppins, sans-serif;
+        }
+
+        .cart-container {
+            width: 70%;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 15px 0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .cart-item img {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        h2 {
+            font-size: 30px;
+            color: #1b4332;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cart-container">
+    <h2>Your Cart</h2>
+    <div id="cartItems"></div>
+
+    <h3 id="totalPrice" style="margin-top:20px;">Total: ₹0</h3>
+      <!-- buy-all button will be inserted here -->
+<div style="margin-top:12px;">
+    <button onclick="buyNowAll()"
+        style="padding:10px 16px;background:#1b6b3a;color:white;border:none;border-radius:6px;cursor:pointer;font-size:16px;">
+        Buy All Now
+    </button>
+</div>
+
+
+<div id="cartItems"></div>
+</div>
+    
+<script>
+
+/* -----------------------------
+   GET CART FROM LOCAL STORAGE
+------------------------------ */
+function getCart() {
+    return JSON.parse(localStorage.getItem("cartItems") || "[]");
+}
+
+/* -----------------------------
+   SAVE CART
+------------------------------ */
+function saveCart(cart) {
+    localStorage.setItem("cartItems", JSON.stringify(cart));
+}
+
+/* -----------------------------
+   LOAD / DISPLAY CART
+------------------------------ */
+function loadCart() {
+    const cart = getCart();
+    const container = document.getElementById("cartItems");
+    const totalElement = document.getElementById("totalPrice");
+
+    if (!cart.length) {
+        container.innerHTML = "<p>Your cart is empty.</p>";
+        totalElement.textContent = "Total: ₹0";
+        return;
+    }
+
+    let html = "";
+    let total = 0;
+
+    cart.forEach((item, i) => {
+        const subtotal = item.price * (item.qty || 1);
+        total += subtotal;
+
+        html += `
+        <div class="cart-item" style="display:flex;gap:15px;align-items:center;padding:10px 0;border-bottom:1px solid #ddd;">
+
+            <img src="${item.img}" style="width:90px;height:90px;border-radius:10px;object-fit:cover;">
+
+            <div style="flex:1;">
+                <h3 style="margin:0;">${item.name}</h3>
+                <p style="margin:5px 0;">₹${item.price}</p>
+
+                <button onclick="decreaseQty(${i})">-</button>
+                <span style="padding:0 10px;">${item.qty || 1}</span>
+                <button onclick="increaseQty(${i})">+</button>
+
+                <p style="margin:5px 0;">Subtotal: ₹${subtotal}</p>
+            </div>
+
+            <button onclick="buyNowItem(${i})"
+                style="padding:8px 12px;background:#1b6b3a;color:white;border:none;border-radius:6px;cursor:pointer;">
+                Buy Now
+            </button>
+
+            <button onclick="removeItem(${i})"
+                style="padding:8px 12px;background:red;color:white;border:none;border-radius:6px;cursor:pointer;">
+                Remove
+            </button>
+
+        </div>
+        `;
+    });
+
+    container.innerHTML = html;
+    totalElement.textContent = "Total: ₹" + total;
+}
+
+/* -----------------------------
+   INCREASE QUANTITY
+------------------------------ */
+function increaseQty(index) {
+    let cart = getCart();
+    cart[index].qty = (cart[index].qty || 1) + 1;
+    saveCart(cart);
+    loadCart();
+}
+
+/* -----------------------------
+   DECREASE QUANTITY
+------------------------------ */
+function decreaseQty(index) {
+    let cart = getCart();
+    if (cart[index].qty > 1) {
+        cart[index].qty -= 1;
+    }
+    saveCart(cart);
+    loadCart();
+}
+
+/* -----------------------------
+   REMOVE ITEM
+------------------------------ */
+function removeItem(index) {
+    let cart = getCart();
+    cart.splice(index, 1);
+    saveCart(cart);
+    loadCart();
+}
+
+/* -----------------------------
+   BUY NOW (single item)
+   → DOES NOT DELETE FROM CART
+------------------------------ */
+function buyNowItem(index) {
+    let cart = getCart();
+
+    const item = cart[index];
+
+    // store only the selected item
+    localStorage.setItem("checkoutItems", JSON.stringify([item]));
+
+    // redirect to checkout
+    window.location.href = "checkout.html";
+}
+
+/* -----------------------------
+   BUY NOW ALL
+   → DOES NOT DELETE CART
+------------------------------ */
+function buyNowAll() {
+    let cart = getCart();
+
+    // send all items to checkout
+    localStorage.setItem("checkoutItems", JSON.stringify(cart));
+
+    // redirect to checkout
+    window.location.href = "checkout.html";
+}
+
+// Buy Now (All)
+function buyAllNow() {
+    const cartItems = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    if (cartItems.length === 0) {
+        alert("Your cart is empty!");
+        return;
+    }
+
+    // Save all items to checkout list
+    localStorage.setItem("checkoutItems", JSON.stringify(cartItems));
+
+    // Redirect to checkout page
+    window.location.href = "checkout.html";
+}
+
+/* -----------------------------
+   INITIALIZE CART PAGE
+------------------------------ */
+document.addEventListener("DOMContentLoaded", loadCart);
+
+</script>
+
+
+
+
+    
+
+
+</body>
+
+</html>

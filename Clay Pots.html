@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Clay Pots</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            background: #e8f8e4;
+            font-family: Poppins, sans-serif;
+        }
+
+        .container {
+            width: 90%;
+            margin: auto;
+            margin-top: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1b4332;
+            font-size: 38px;
+            margin-bottom: 30px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            padding-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+            transition: .3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .product-card h3 {
+            margin-top: 10px;
+            color: #1b4332;
+            font-size: 18px;
+        }
+
+        .product-card p {
+            color: green;
+            font-weight: 600;
+        }
+
+        .btn-box {
+            margin-top: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: none;
+        }
+
+        .cart-btn {
+            background: #1b4332;
+            color: white;
+        }
+
+        .cart-btn:hover {
+            background: #145c32;
+        }
+
+        .buy-btn {
+            background: #2d6a4f;
+            color: white;
+        }
+
+        .buy-btn:hover {
+            background: #1a4b35;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Clay Pots</h1>
+
+        <div class="product-grid">
+
+            <!-- PRODUCT 1 -->
+            <div class="product-card">
+                <img src="i201.webp">
+                <h3>12″ Terracotta Clay Pot Set</h3>
+                <p>₹899</p>
+
+                <div class="btn-box">
+                    <button class="btn cart-btn" onclick="addToCart('12″ Terracotta Clay Pot Set',899,'i201.webp')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('12″ Terracotta Clay Pot Set',899,'i201.webp')">Buy Now</button>
+                </div>
+            </div>
+
+            <!-- PRODUCT 2 -->
+            <div class="product-card">
+                <img src="i202.jpg">
+                <h3>Sienna Terracotta Pots (Set of 3)</h3>
+                <p>₹935</p>
+
+                <div class="btn-box">
+                    <button class="btn cart-btn" onclick="addToCart('Sienna Terracotta Pots (Set of 3)',935,'i202.jpg')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('Sienna Terracotta Pots (Set of 3)',935,'i202.jpg')">Buy Now</button>
+                </div>
+            </div>
+
+            <!-- PRODUCT 3 -->
+            <div class="product-card">
+                <img src="i203.jpg">
+                <h3>Wonderland Snail Terracotta Pot</h3>
+                <p>₹549</p>
+
+                <div class="btn-box">
+                    <button class="btn cart-btn" onclick="addToCart('Wonderland Snail Terracotta Pot',549,'i203.jpg')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('Wonderland Snail Terracotta Pot',549,'i203.jpg')">Buy Now</button>
+                </div>
+            </div>
+
+            <!-- PRODUCT 4 -->
+            <div class="product-card">
+                <img src="i204.jpg">
+                <h3>Rusticana Terracotta Planter - Set Of Four</h3>
+                <p>₹1150</p>
+
+                <div class="btn-box">
+                    <button class="btn cart-btn" onclick="addToCart('Rusticana Terracotta Planter - Set Of Four',1150,'i204.jpg')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('Rusticana Terracotta Planter - Set Of Four',1150,'i204.jpg')">Buy Now</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    
+<script src="script.js"></script>
+
+<script>
+function buyNow(name, price, img) {
+    // Save only this 1 product for direct purchase
+    const directOrder = [{
+        name: name,
+        price: price,
+        img: img,
+        quantity: 1
+    }];
+
+    // Save to localStorage
+    localStorage.setItem("directBuyItem", JSON.stringify(directOrder));
+
+    // Redirect to checkout form (order form page)
+    window.location.href = "order-form.html";
+}
+
+
+
+
+        
+</script>
+
+</body>
+</html>

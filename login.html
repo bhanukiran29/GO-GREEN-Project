@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Login / Signup</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background: #d8f3dc;
+            font-family: Poppins, Arial;
+        }
+
+        /* Main box */
+        .login-box {
+            width: 380px;
+            margin: 60px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Titles */
+        .login-box h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        /* Buttons */
+        .btn-login {
+            background: #52b788;
+            color: white;
+            font-size: 16px;
+        }
+
+        .btn-signup {
+            background: #0077cc;
+            color: white;
+            font-size: 16px;
+        }
+
+        /* Hide signup form by default */
+        #signupForm {
+            display: none;
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <div class="login-box">
+
+        <!-- LOGIN FORM -->
+        <div id="loginForm">
+            <h2>Signup / Login</h2>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input id="loginEmail" type="email" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input id="loginPassword" type="password" class="form-control">
+            </div>
+
+            <button onclick="loginUser()" class="btn btn-login btn-block">Login</button>
+
+            <hr>
+
+            <button onclick="showSignup()" class="btn btn-signup btn-block">Create Account</button>
+        </div>
+
+
+        <!-- SIGNUP FORM -->
+        <div id="signupForm">
+            <h2>Create Account</h2>
+
+            <div class="form-group">
+                <label>Full Name</label>
+                <input id="signupName" type="text" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input id="signupEmail" type="email" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input id="signupPhone" type="number" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input id="signupPassword" type="password" class="form-control">
+            </div>
+
+            <button onclick="createAccount()" class="btn btn-login btn-block">Create Account</button>
+
+            <br>
+            <button onclick="showLogin()" class="btn btn-default btn-block">Back to Login</button>
+        </div>
+
+    </div>
+
+
+    <script>
+        /* -------------------------
+            Switch Forms
+        --------------------------*/
+        function showSignup() {
+            document.getElementById("loginForm").style.display = "none";
+            document.getElementById("signupForm").style.display = "block";
+        }
+
+        function showLogin() {
+            document.getElementById("signupForm").style.display = "none";
+            document.getElementById("loginForm").style.display = "block";
+        }
+    </script>
+    <script src="script.js"></script>
+
+</body>
+
+</html>

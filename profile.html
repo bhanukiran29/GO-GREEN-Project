@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Profile</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background: #d8f3dc;
+            font-family: Poppins, Arial;
+        }
+
+        /* MAIN WRAPPER */
+        .profile-container {
+            max-width: 1050px;
+            margin: 60px auto;
+            display: flex;
+            gap: 25px;
+        }
+
+        /* LEFT SIDEBAR */
+        .profile-sidebar {
+            width: 28%;
+            background: white;
+            border-radius: 14px;
+            padding: 30px 20px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            background: #2f6f4e;
+            color: #fff;
+            font-size: 46px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 15px;
+        }
+
+        .profile-sidebar h2 {
+            font-size: 22px;
+            color: #1b4332;
+            margin-top: 10px;
+        }
+
+        .profile-sidebar small {
+            color: #2d6a4f;
+        }
+
+        /* RIGHT CONTENT */
+        .profile-content {
+            flex: 1;
+            background: white;
+            border-radius: 14px;
+            padding: 30px 30px 40px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1b4332;
+            border-left: 5px solid #2d6a4f;
+            padding-left: 10px;
+        }
+
+        .info-row {
+            margin-bottom: 18px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            font-size: 15px;
+            color: #1b4332;
+        }
+
+        .info-value {
+            color: #2d6a4f;
+            font-size: 16px;
+        }
+
+        .home-btn {
+            margin-top: 20px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .profile-container {
+                flex-direction: column;
+            }
+
+            .profile-sidebar,
+            .profile-content {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="profile-container">
+
+        <!-- LEFT SIDEBAR -->
+        <div class="profile-sidebar">
+            <div class="profile-avatar" id="profileAvatar">U</div>
+            <h2 id="profileName">User Name</h2>
+            <small id="profileEmail">email@example.com</small>
+            <br><br>
+            <small id="profilePhone">Phone</small>
+        </div>
+
+        <!-- RIGHT SIDE DETAILS -->
+        <div class="profile-content">
+            <div class="section-title">Account Details</div>
+
+            <div class="info-row">
+                <div class="info-label">Full Name:</div>
+                <div class="info-value" id="detailName"></div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">Email Address:</div>
+                <div class="info-value" id="detailEmail"></div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">Phone Number:</div>
+                <div class="info-value" id="detailPhone"></div>
+            </div>
+
+            <hr>
+
+            <div class="section-title">My Orders</div>
+            <div id="ordersContainer">
+                <p>Loading orders...</p>
+            </div>
+
+            <hr>
+
+            <div class="section-title">About</div>
+            <p style="color:#2d6a4f;">
+                Your profile details are securely stored locally. Orders are fetched from the backend.
+            </p>
+
+            <a href="index.html" class="btn btn-success home-btn">Back to Home</a>
+        </div>
+
+    </div>
+
+    <!-- Inline script removed; logic is in script.js -->
+
+</body>
+
+</html>
