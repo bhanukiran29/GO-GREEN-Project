@@ -14,11 +14,70 @@ const API_URL = "http://localhost:5002/api";
 function $(sel) { return document.querySelector(sel); }
 function $all(sel) { return Array.from(document.querySelectorAll(sel)); }
 
+/* ---------- Session Management ---------- */
+function getUserId() {
+  return sessionStorage.getItem("userId");
+}
+
+function getSessionToken() {
+  return sessionStorage.getItem("sessionToken");
+}
+
+function isLoggedIn() {
+  return !!getSessionToken() && !!getUserId();
+}
+
+function clearSession() {
+  sessionStorage.removeItem("userId");
+  sessionStorage.removeItem("sessionToken");
+  sessionStorage.removeItem("userName");
+  sessionStorage.removeItem("userEmail");
+}
+
 /* ---------- Location Dropdown ---------- */
-function setLocation(city) {
+async function setLocation(city) {
   const el = document.getElementById("selected-location");
   if (el) el.innerText = city;
-  localStorage.setItem("selectedLocation", city);
+
+  const userId = getUserId();
+  if (!userId) {
+    // Guest user - store temporarily in sessionStorage
+    sessionStorage.setItem("guestLocation", city);
+    return;
+  }
+
+  try {
+    await fetch(`${API_URL}/preferences/location`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, location: city })
+    });
+  } catch (err) {
+    console.error("Error saving location:", err);
+  }
+}
+
+async function loadUserLocation() {
+  const userId = getUserId();
+  if (!userId) {
+    const guestLoc = sessionStorage.getItem("guestLocation");
+    if (guestLoc) {
+      const el = document.getElementById("selected-location");
+      if (el) el.innerText = guestLoc;
+    }
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/auth/user/${userId}`);
+    const user = await res.json();
+    if (user.selectedLocation && user.selectedLocation !== 'Select Location') {
+      const el = document.getElementById("selected-location");
+      if (el) el.innerText = user.selectedLocation;
+    }
+  } catch (err) {
+    console.error("Error loading location:", err);
+  }
 }
 
 /* ---------- ACCOUNT: Signup & Login ---------- */
@@ -74,7 +133,12 @@ async function loginUser() {
     const data = await res.json();
 
     if (res.ok) {
-      localStorage.setItem("userData", JSON.stringify(data.user));
+      // Store session data
+      sessionStorage.setItem("sessionToken", data.sessionToken);
+      sessionStorage.setItem("userId", data.userId);
+      sessionStorage.setItem("userName", data.userName);
+      sessionStorage.setItem("userEmail", data.userEmail);
+
       alert("Login successful!");
       window.location.href = "index.html";
     } else {
@@ -88,22 +152,20 @@ async function loginUser() {
 /* ---------- USER MENU & PROFILE helpers ---------- */
 
 function refreshUserMenu() {
-  const raw = localStorage.getItem("userData");
   const userMenuEl = document.getElementById("userMenu");
   const loginLinkEl = document.getElementById("navLoginLink");
 
-  if (!raw) {
+  if (!isLoggedIn()) {
     if (userMenuEl) userMenuEl.style.display = "none";
-    if (loginLinkEl) loginLinkEl.style.display = "block"; // Show login link
+    if (loginLinkEl) loginLinkEl.style.display = "block";
     return;
   }
 
   // User is logged in
-  if (loginLinkEl) loginLinkEl.style.display = "none"; // Hide login link
+  if (loginLinkEl) loginLinkEl.style.display = "none";
 
-  const user = JSON.parse(raw);
-  const name = user.name || user.email || "User";
-  const email = user.email || "";
+  const name = sessionStorage.getItem("userName") || "User";
+  const email = sessionStorage.getItem("userEmail") || "";
   const initial = (name && name.trim().charAt(0).toUpperCase()) || "U";
 
   const mName = document.getElementById("menuUserName");
@@ -127,34 +189,37 @@ function refreshUserMenu() {
 
 function logoutUser() {
   if (!confirm("Do you want to logout?")) return;
-  localStorage.removeItem("userData");
-  // localStorage.removeItem("cartItems"); // REMOVED: Keep user's cart saved
+  clearSession();
   refreshUserMenu();
-  refreshCartBadge(); // Update badge for guest (likely 0 or guest cart)
+  refreshCartBadge();
   window.location.href = "login.html";
 }
 
 /* ---------- Edit Profile Modal handlers ---------- */
 
 function openEditProfileModal() {
-  const raw = localStorage.getItem("userData");
-  if (!raw) return alert("No user data found.");
+  const userId = getUserId();
+  if (!userId) return alert("Please login first.");
 
-  const user = JSON.parse(raw);
+  // Fetch current user data
+  fetch(`${API_URL}/auth/user/${userId}`)
+    .then(res => res.json())
+    .then(user => {
+      document.getElementById("editName").value = user.name || "";
+      document.getElementById("editEmail").value = user.email || "";
+      document.getElementById("editPhone").value = user.phone || "";
+      document.getElementById("editPassword").value = "********";
 
-  // Fill fields
-  document.getElementById("editName").value = user.name || "";
-  document.getElementById("editEmail").value = user.email || "";
-  document.getElementById("editPhone").value = user.phone || "";
-  // Show hidden password (fake — not real password)
-  document.getElementById("editPassword").value = "********";
-
-  // Show the modal
-  if (window.jQuery) {
-    $('#editProfileModal').modal('show');
-  } else {
-    alert("Bootstrap modal required.");
-  }
+      if (window.jQuery) {
+        $('#editProfileModal').modal('show');
+      } else {
+        alert("Bootstrap modal required.");
+      }
+    })
+    .catch(err => {
+      console.error("Error loading profile:", err);
+      alert("Error loading profile data.");
+    });
 }
 
 
@@ -290,79 +355,114 @@ async function populateProfilePage() {
   }
 }
 
-/* ---------- Basic Cart System ---------- */
+/* ---------- Database-Backed Cart System ---------- */
 
-function _getCartKey() {
-  const raw = localStorage.getItem("userData");
-  if (raw) {
-    const user = JSON.parse(raw);
-    return `cartItems_${user._id}`;
-  }
-  return "cartItems_guest";
-}
+async function _fetchCart() {
+  const userId = getUserId();
+  if (!userId) return [];
 
-function _readCart() {
   try {
-    return JSON.parse(localStorage.getItem(_getCartKey()) || "[]");
-  } catch (e) {
+    const res = await fetch(`${API_URL}/cart/${userId}`);
+    const data = await res.json();
+    return data.items || [];
+  } catch (err) {
+    console.error("Error fetching cart:", err);
     return [];
   }
 }
 
-function _writeCart(cart) {
-  localStorage.setItem(_getCartKey(), JSON.stringify(cart));
-}
+async function addToCart(name, price, img) {
+  console.log("addToCart called:", { name, price, img });
 
-function addToCart(name, price, img) {
-  let cart = _readCart();
-
-  let existing = cart.find(item => item.name === name);
-
-  if (existing) {
-    existing.qty += 1;
-  } else {
-    cart.push({
-      id: "p" + Date.now(),
-      name,
-      price,
-      img,
-      qty: 1
-    });
+  const userId = getUserId();
+  if (!userId) {
+    alert("Please login to add items to cart");
+    window.location.href = "login.html";
+    return;
   }
 
-  _writeCart(cart);
-  alert(name + " added to cart!");
-  refreshCartBadge();
+  try {
+    const payload = {
+      userId: userId,
+      productId: "p" + Date.now(),
+      name,
+      price: Number(price),
+      img
+    };
+    console.log("Sending to API:", payload);
+
+    const res = await fetch(`${API_URL}/cart/add`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    console.log("Response status:", res.status);
+    const data = await res.json();
+    console.log("Response data:", data);
+
+    if (res.ok) {
+      alert(name + " added to cart!");
+      await refreshCartBadge();
+    } else {
+      alert(data.message || "Failed to add to cart");
+    }
+  } catch (err) {
+    console.error("Error in addToCart:", err);
+    alert("Error connecting to server: " + err.message);
+  }
 }
 
-function removeFromCart(itemId) {
-  let cart = _readCart();
-  cart = cart.filter(i => i.id !== itemId);
-  _writeCart(cart);
-  renderCartPage();
-  refreshCartBadge();
+async function removeFromCart(productId) {
+  const userId = getUserId();
+  if (!userId) return;
+
+  try {
+    const res = await fetch(`${API_URL}/cart/remove`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, productId })
+    });
+
+    if (res.ok) {
+      await renderCartPage();
+      await refreshCartBadge();
+    }
+  } catch (err) {
+    console.error("Error removing from cart:", err);
+  }
 }
 
-function changeQty(itemId, qty) {
-  let cart = _readCart();
-  const it = cart.find(i => i.id === itemId);
-  if (!it) return;
-  it.qty = Math.max(1, Number(qty) || 1);
-  _writeCart(cart);
-  renderCartPage();
-  refreshCartBadge();
+async function changeQty(productId, qty) {
+  const userId = getUserId();
+  if (!userId) return;
+
+  try {
+    const res = await fetch(`${API_URL}/cart/update`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, productId, qty: Number(qty) })
+    });
+
+    if (res.ok) {
+      await renderCartPage();
+      await refreshCartBadge();
+    }
+  } catch (err) {
+    console.error("Error updating quantity:", err);
+  }
 }
 
-function getCartTotal() {
-  const cart = _readCart();
+async function getCartTotal() {
+  const cart = await _fetchCart();
   return cart.reduce((sum, i) => sum + (i.price * (i.qty || 1)), 0);
 }
 
-function renderCartPage() {
+async function renderCartPage() {
   const container = document.getElementById("cartContainer");
   if (!container) return;
 
-  const cart = _readCart();
+  const cart = await _fetchCart();
 
   if (!cart.length) {
     container.innerHTML = `<h3>Your cart is empty.</h3>`;
@@ -384,20 +484,20 @@ function renderCartPage() {
       <tbody>
   `;
 
-  cart.forEach((item, i) => {
+  cart.forEach((item) => {
     html += `
       <tr>
           <td><img src="${item.img}" width="70"></td>
           <td>${item.name}</td>
           <td>₹${item.price}</td>
           <td>
-              <button onclick="decreaseQty(${i})">-</button>
+              <button onclick="decreaseQty('${item.productId}')">-</button>
               ${item.qty}
-              <button onclick="increaseQty(${i})">+</button>
+              <button onclick="increaseQty('${item.productId}')">+</button>
           </td>
           <td>₹${item.price * item.qty}</td>
           <td>
-              <button class="btn btn-danger btn-sm" onclick="removeItem(${i})">X</button>
+              <button class="btn btn-danger btn-sm" onclick="removeItem('${item.productId}')">X</button>
           </td>
       </tr>`;
   });
@@ -412,59 +512,61 @@ function renderCartPage() {
   container.innerHTML = html;
 }
 
-function increaseQty(i) {
-  let cart = _readCart();
-  cart[i].qty++;
-  _writeCart(cart);
-  renderCartPage();
+async function increaseQty(productId) {
+  const cart = await _fetchCart();
+  const item = cart.find(i => i.productId === productId);
+  if (item) {
+    await changeQty(productId, item.qty + 1);
+  }
 }
 
-function decreaseQty(i) {
-  let cart = _readCart();
-  if (cart[i].qty > 1) cart[i].qty--;
-  _writeCart(cart);
-  renderCartPage();
+async function decreaseQty(productId) {
+  const cart = await _fetchCart();
+  const item = cart.find(i => i.productId === productId);
+  if (item && item.qty > 1) {
+    await changeQty(productId, item.qty - 1);
+  }
 }
 
-function removeItem(i) {
-  let cart = _readCart();
-  cart.splice(i, 1);
-  _writeCart(cart);
-  renderCartPage();
-  refreshCartBadge();
+async function removeItem(productId) {
+  await removeFromCart(productId);
 }
 
 async function checkout() {
-  const cart = _readCart();
-  if (!cart.length) { alert("Your cart is empty."); return; }
+  const cart = await _fetchCart();
+  if (!cart.length) {
+    alert("Your cart is empty.");
+    return;
+  }
 
-  const rawUser = localStorage.getItem("userData");
-  if (!rawUser) {
+  const userId = getUserId();
+  if (!userId) {
     alert("Please login to checkout.");
     window.location.href = "login.html";
     return;
   }
-  const user = JSON.parse(rawUser);
-  const userId = user._id || "guest"; // MongoDB ID if available
 
   try {
+    const total = await getCartTotal();
     const res = await fetch(`${API_URL}/orders`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         userId,
         items: cart,
-        total: getCartTotal()
+        total
       })
     });
+
     const data = await res.json();
 
     if (res.ok) {
-      localStorage.removeItem(_getCartKey());
-      // Explicitly clear the UI immediately
+      // Clear cart via backend
+      await fetch(`${API_URL}/cart/clear/${userId}`, { method: "DELETE" });
+
       const container = document.getElementById("cartContainer");
       if (container) container.innerHTML = "<h3>Your cart is empty.</h3>";
-      refreshCartBadge();
+      await refreshCartBadge();
       alert("Order placed successfully!");
       window.location.reload();
     } else {
@@ -475,36 +577,25 @@ async function checkout() {
   }
 }
 
-function refreshCartBadge() {
-  const count = _readCart().reduce((s, i) => s + (i.qty || 1), 0);
+async function refreshCartBadge() {
+  const cart = await _fetchCart();
+  const count = cart.reduce((s, i) => s + (i.qty || 1), 0);
   const badge = document.getElementById("cartBadge");
   if (badge) badge.innerText = count || "";
 }
 
-function smoothScroll(targetID) {
-  const el = document.querySelector(targetID);
-  if (!el) return;
-  el.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
+/* ---------- Initialization ---------- */
 document.addEventListener("DOMContentLoaded", function () {
-  const savedLoc = localStorage.getItem("selectedLocation");
-  if (savedLoc) {
-    const el = document.getElementById("selected-location");
-    if (el) el.innerText = savedLoc;
-  }
-
+  // Initial checks
   refreshUserMenu();
-
-  if (window.jQuery) {
-    $('#editProfileModal').on('show.bs.modal', function () {
-      openEditProfileModal();
-    });
-  }
-
-  renderCartPage();
   refreshCartBadge();
 
+  // If we are on the cart page, render it
+  if (document.getElementById("cartContainer")) {
+    renderCartPage();
+  }
+
+  // Event Listeners
   const loginBtn = document.getElementById("loginBtn");
   if (loginBtn) loginBtn.addEventListener("click", function (e) { e.preventDefault(); loginUser(); });
 
@@ -516,4 +607,11 @@ document.addEventListener("DOMContentLoaded", function () {
     e.preventDefault();
     saveProfileEdits();
   });
+
+  // jQuery specific handlers
+  if (window.jQuery) {
+    $('#editProfileModal').on('show.bs.modal', function () {
+      openEditProfileModal();
+    });
+  }
 });
