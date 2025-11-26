@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Indoor Plants</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            background: #e8f8e4;
+            font-family: Poppins, sans-serif;
+        }
+
+        .container {
+            width: 90%;
+            margin: auto;
+            margin-top: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1b4332;
+            font-size: 38px;
+            margin-bottom: 30px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            padding-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+            transition: .3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .product-card h3 {
+            margin-top: 10px;
+            color: #1b4332;
+            font-size: 18px;
+        }
+
+        .product-card p {
+            color: green;
+            font-weight: 600;
+        }
+
+        .btn-box {
+            margin-top: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: none;
+        }
+
+        .cart-btn {
+            background: #1b4332;
+            color: white;
+        }
+
+        .cart-btn:hover {
+            background: #145c32;
+        }
+
+        .buy-btn {
+            background: #2d6a4f;
+            color: white;
+        }
+
+        .buy-btn:hover {
+            background: #1a4b35;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>SKIN CARE</h1>
+
+        <div class="product-grid">
+
+            <!-- PRODUCT 1 -->
+            <div class="product-card">
+                <img src="f1.jpeg">
+                <h3>Sampurn face oil</h3>
+                <p>₹250</p>
+
+                <div class="btn-box">
+                    <button class="btn cart-btn" onclick="addToCart('Sampurn face oil',250,'f1.jpeg')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('Sampurn face oil',250,'f1.jpeg')">Buy Now</button>
+                </div>
+            </div>
+
+            <!-- PRODUCT 2 -->
+            <div class="product-card">
+                <img src="f2.jpg">
+                <h3>skin glow oil</h3>
+                <p>₹159</p>
+
+                <div class="btn-box">
+                    <button class="btn cart-btn" onclick="addToCart('Skin glow oil',159,'f2.jpg')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('Skin glow oil',159,'f2.jpg')">Buy Now</button>
+                </div>
+            </div>
+
+            <!-- PRODUCT 3 -->
+            <div class="product-card">
+                <img src="f6.avif">
+                <h3>Vitamin c mosturiser</h3>
+                <p>₹160</p>
+
+                <div class="btn-box">
+                    <button class="btn cart-btn" onclick="addToCart('Vitamin c mosturiser',160,'f6.avif')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('Vitamin c mosturiser',160,'f6.avif')">Buy Now</button>
+                </div>
+            </div>
+
+            <!-- PRODUCT 4 -->
+            <div class="product-card">
+                <img src="f4.webp">
+                <h3>Niaciname face wash</h3>
+                <p>₹399</p>
+
+                <div class="btn-box">
+                    <button class="btn cart-btn" onclick="addToCart('Niaciname face wash',399,'f4.webp')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('Niaciname face wash',399,'f4.webp')">Buy Now</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    
+<script src="script.js"></script>
+
+<script>
+function buyNow(name, price, img) {
+    // Save only this 1 product for direct purchase
+    const directOrder = [{
+        name: name,
+        price: price,
+        img: img,
+        quantity: 1
+    }];
+
+    // Save to localStorage
+    localStorage.setItem("directBuyItem", JSON.stringify(directOrder));
+
+    // Redirect to checkout form (order form page)
+    window.location.href = "order-form.html";
+}
+
+
+
+
+        
+</script>
+
+</body>
+</html>
