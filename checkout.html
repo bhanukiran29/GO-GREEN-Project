@@ -3,123 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <title>Checkout</title>
+
     <style>
         body {
             background: #e8f8e4;
-            font-family: Poppins, sans-serif;
+            font-family: "Poppins", sans-serif;
+            margin: 0;
+            padding: 0;
         }
-        .box {
-            width: 80%;
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
             margin: 40px auto;
+        }
+
+        /* ORDER SUMMARY CARD */
+        .card {
             background: white;
             padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 14px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
         }
+
+        .section-title {
+            font-size: 22px;
+            color: #1b6b3a;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        /* ITEM ROW */
         .item-row {
             display: flex;
             align-items: center;
-            gap: 15px;
-            border-bottom: 1px solid #ddd;
+            gap: 18px;
             padding: 12px 0;
+            border-bottom: 1px solid #edf1ed;
         }
-        img {
-            width: 80px;
-            height: 80px;
-            border-radius: 8px;
+
+        .item-row img {
+            width: 85px;
+            height: 85px;
+            border-radius: 10px;
             object-fit: cover;
         }
-        .btn {
+
+        .item-info h4 {
+            margin: 0;
+            font-size: 18px;
+            color: #1b1b1b;
+        }
+
+        .item-info p {
+            margin: 2px 0 0;
+            color: #444;
+        }
+
+        /* ADDRESS FORM */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .form-grid input {
+            padding: 12px;
+            border: 1px solid #cfd8cf;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        /* BUTTON */
+        .btn-place {
             background: #1b6b3a;
             color: white;
+            padding: 14px 24px;
             border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
-            margin-top: 20px;
-            cursor: pointer;
+            border-radius: 10px;
+            margin-top: 25px;
             font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s ease;
         }
-        .btn:hover {
-            background: #14522c;
+
+        .btn-place:hover {
+            background: #15562D;
+        }
+
+        .total-box {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .item-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
 </head>
+
 <body>
 
-    <div class="box">
-        <h2>Order Summary</h2>
+<div class="container">
+
+    <!-- ORDER SUMMARY -->
+    <div class="card">
+        <div class="section-title">🛒 Order Summary</div>
         <div id="orderDetails"></div>
 
-        <h3 id="grandTotal" style="margin-top:15px;">Total: ₹0</h3>
-
-        <button class="btn" onclick="placeOrder()">Place Order</button>
+        <div class="total-box">
+            Total: <span id="grandTotal">₹0</span>
+        </div>
     </div>
 
+    <!-- DELIVERY ADDRESS -->
+    <div class="card">
+        <div class="section-title">📍 Delivery Address</div>
+
+        <div class="form-grid">
+            <input id="name" placeholder="Full Name">
+            <input id="phone" placeholder="Phone Number">
+            <input id="state" placeholder="State">
+            <input id="district" placeholder="District">
+            <input id="city" placeholder="City">
+            <input id="street" placeholder="Street">
+            <input id="pincode" placeholder="Pincode">
+        </div>
+
+        <button type="button" class="btn-place" onclick="placeOrder()">Place Order</button>
+    </div>
+
+</div>
+
 <script>
+/* ------------------ LOAD CHECKOUT (BUY NOW OR FROM CART) ------------------ */
+function loadCheckoutSummary() {
+    let item = JSON.parse(localStorage.getItem("checkoutSingle"));
 
-/* -----------------------------
-   LOAD ITEMS FROM checkoutItems
------------------------------- */
-const items = JSON.parse(localStorage.getItem("checkoutItems") || "[]");
-const out = document.getElementById("orderDetails");
-const totalEl = document.getElementById("grandTotal");
-
-if (!items.length) {
-    out.innerHTML = "<p>No items selected for checkout.</p>";
-} else {
-    let total = 0;
-    let html = "";
-
-    items.forEach(it => {
-        let subtotal = it.price * (it.qty || 1);
-        total += subtotal;
-
-        html += `
-            <div class="item-row">
-                <img src="${it.img}">
-                <div>
-                    <h4>${it.name}</h4>
-                    <p>₹${it.price} × ${it.qty || 1} = ₹${subtotal}</p>
-                </div>
-            </div>
-        `;
-    });
-
-    out.innerHTML = html;
-    totalEl.innerHTML = "Total: ₹" + total;
-}
-
-/* -----------------------------
-   PLACE ORDER
------------------------------- */
-function placeOrder() {
-    if (!items.length) {
-        alert("No items to place order.");
+    if (!item) {
+        document.getElementById("orderDetails").innerHTML = "<p>No product selected.</p>";
+        document.getElementById("grandTotal").innerText = "₹0";
         return;
     }
 
-    const order = {
-        id: "ORDER_" + Date.now(),
-        createdAt: new Date().toISOString(),
-        items: items,
-        total: items.reduce((sum, it) => sum + it.price * (it.qty || 1), 0)
-    };
+    document.getElementById("orderDetails").innerHTML = `
+        <div class="item-row">
+            <img src="${item.img}" alt="">
+            <div class="item-info">
+                <h4>${item.name}</h4>
+                <p>₹${item.price} × 1 = ₹${item.price}</p>
+            </div>
+        </div>
+    `;
 
-    // Save order history
-    const allOrders = JSON.parse(localStorage.getItem("orders") || "[]");
-    allOrders.push(order);
-    localStorage.setItem("orders", JSON.stringify(allOrders));
-
-    // clear checkout items
-    localStorage.removeItem("checkoutItems");
-
-    // redirect
-    localStorage.setItem("lastOrder", JSON.stringify(order));
-    window.location.href = "address.html";
-
+    document.getElementById("grandTotal").innerText = "₹" + item.price;
 }
 
-</script>
+/* ------------------ PLACE ORDER ------------------ */
+async function placeOrder() {
+    const fullName = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const state = document.getElementById("state").value.trim();
+    const district = document.getElementById("district").value.trim();
+    const city = document.getElementById("city").value.trim();
+    const street = document.getElementById("street").value.trim();
+    const pincode = document.getElementById("pincode").value.trim();
 
+    if (!fullName || !phone || !state || !district || !city || !street || !pincode) {
+        alert("Please fill all address fields!");
+        return;
+    }
+
+    const userId = sessionStorage.getItem("userId");
+    if (!userId) {
+        alert("Please login to place order");
+        return;
+    }
+
+    const item = JSON.parse(localStorage.getItem("checkoutSingle"));
+    if (!item) {
+        alert("No product found to order.");
+        return;
+    }
+
+    const orderPayload = {
+        userId,
+        items: [{ 
+            productId: item.productId,
+            name: item.name,
+            price: item.price,
+            qty: 1,
+            img: item.img
+        }],
+        address: { fullName, phone, state, district, city, street, pincode }
+    };
+
+    try {
+        const res = await fetch("http://localhost:5002/api/orders/create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(orderPayload)
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+            alert(data.error || "Error placing order");
+            return;
+        }
+
+        // SUCCESS — clear single-product checkout
+        localStorage.removeItem("checkoutSingle");
+
+        window.location.href = `order-success.html?orderId=${data.orderId}`;
+    } catch (err) {
+        console.error(err);
+        alert("Server error");
+    }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const checkoutBox = document.getElementById("checkoutItemsBox");
+    const totalBox = document.getElementById("checkoutTotal");
+
+    let singleItem = JSON.parse(localStorage.getItem("checkoutSingle"));
+
+    if (singleItem) {
+        checkoutBox.innerHTML = `
+            <div class="checkout-item">
+                <img src="${singleItem.img}" width="80">
+                <div>
+                    <h4>${singleItem.name}</h4>
+                    <p>₹${singleItem.price} × 1 = ₹${singleItem.price}</p>
+                </div>
+            </div>
+        `;
+        totalBox.innerText = "₹" + singleItem.price;
+        return;
+    }
+
+    checkoutBox.innerHTML = "No product selected.";
+    totalBox.innerText = "₹0";
+});
+
+
+/* ------------------ INIT LOAD ------------------ */
+document.addEventListener("DOMContentLoaded", loadCheckoutSummary);
+</script>
 </body>
 </html>

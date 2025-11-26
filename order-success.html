@@ -51,51 +51,28 @@
     <h1>🎉 Order Placed Successfully!</h1>
     <p>Thank you for shopping with us.</p>
     <p>Your items will be delivered soon.</p>
+    <p id="orderInfo" style="margin-top: 10px; font-size:18px; color:#1b4332;"></p>
 
     <button onclick="goHome()">Go to Home</button>
 </div>
 
 <script>
-function goHome() {
-    // Clear cart
-    localStorage.removeItem("cart");
-    localStorage.removeItem("checkoutItems");
+function loadOrderSuccess() {
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get("orderId");
 
+    if (orderId) {
+        document.getElementById("orderInfo").innerHTML =
+            `Your Order ID is: <b>${orderId}</b>`;
+    }
+}
+
+function goHome() {
     window.location.href = "index.html";
 }
 
-window.onload = function () {
-    // Load checkout items
-    const items = JSON.parse(localStorage.getItem("checkoutItems")) || [];
-
-    // Load address
-    const address = JSON.parse(localStorage.getItem("addressDetails")) || {};
-
-    if (items.length === 0) return;
-
-    // Create an order object
-    const newOrder = {
-        id: Date.now(),
-        items: items,
-        address: address,
-        date: new Date().toLocaleString()
-    };
-
-    // Get existing order list
-    const orderList = JSON.parse(localStorage.getItem("orders")) || [];
-
-    // Add this new order to order list
-    orderList.push(newOrder);
-
-    // Save to localStorage
-    localStorage.setItem("orders", JSON.stringify(orderList));
-
-    // Clear checkout data
-    localStorage.removeItem("checkoutItems");
-    localStorage.removeItem("addressDetails");
-};
+loadOrderSuccess();
 </script>
-
 
 </body>
 </html>

@@ -11,7 +11,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // MongoDB Connection
-mongoose.connect('mongodb://127.0.0.1:27017/gogreen', {
+mongoose.connect('mongodb+srv://srideviddcs25_db_user:Sridevi072006@goreencluster.nw6mq2s.mongodb.net/?retryWrites=true&w=majority&appName=GoreenCluster', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => console.log('MongoDB Connected'))
@@ -82,23 +82,41 @@ app.post('/api/auth/login', async (req, res) => {
 });
 
 // 2.5 Update Profile
-app.put('/api/auth/update', async (req, res) => {
-    console.log("Update profile attempt:", req.body);
+// Correct update route: /api/auth/update-profile/:id
+app.put('/api/auth/update-profile/:id', async (req, res) => {
+    console.log("Update profile:", req.params.id, req.body);
+
     try {
-        const { _id, name, email, phone, password } = req.body;
+        const userId = req.params.id;
+        const { name, email, phone, password } = req.body;
+
         const updateData = { name, email, phone };
-        if (password && password.trim() !== "") updateData.password = password.trim();
+        if (password && password.trim() !== "") {
+            updateData.password = password.trim();
+        }
 
-        const user = await User.findByIdAndUpdate(_id, updateData, { new: true });
-        if (!user) return res.status(404).json({ message: "User not found" });
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            updateData,
+            { new: true }
+        ).select("-password -sessionToken");
 
-        console.log("Profile updated:", user._id);
-        res.json({ message: "Profile updated successfully", user });
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.json({
+            message: "Profile updated successfully",
+            user: updatedUser
+        });
+
     } catch (err) {
-        console.error("Update error:", err);
+        console.error("Update-profile error:", err);
         res.status(500).json({ error: err.message });
     }
 });
+
 
 // 3. Place Order
 app.post('/api/orders', async (req, res) => {
@@ -353,4 +371,70 @@ app.delete('/api/checkout/session/:userId', async (req, res) => {
     }
 });
 
+// ⭐ FULL BACKEND CHECKOUT ⭐
+// This replaces localStorage-based checkout.
+app.post('/api/checkout', async (req, res) => {
+    console.log("Checkout request:", req.body);
+
+    try {
+        const { userId, address } = req.body;
+        if (!userId) return res.status(400).json({ message: "User ID is required" });
+
+        // 1. Get user cart
+        const cart = await Cart.findOne({ userId });
+        if (!cart || cart.items.length === 0) {
+            return res.status(400).json({ message: "Cart is empty" });
+        }
+
+        // 2. Calculate total
+        const total = cart.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+        // 3. Create Order
+        const newOrder = new Order({
+            userId,
+            items: cart.items,
+            total,
+            date: new Date()
+        });
+
+        await newOrder.save();
+
+        // 4. Save address to User document
+        if (address) {
+            const user = await User.findById(userId);
+
+            if (user) {
+                user.addresses.push(address);
+                await user.save();
+            }
+        }
+
+        // 5. Remove only purchased items from cart
+if (address?.productIds && Array.isArray(address.productIds)) {
+    // Remove only items that were purchased
+    cart.items = cart.items.filter(item => 
+        !address.productIds.includes(item.productId)
+    );
+} else {
+    console.log("Warning: No productIds received, cart not modified.");
+}
+
+        await cart.save();
+
+        res.json({ 
+            message: "Checkout successful", 
+            orderId: newOrder._id 
+        });
+
+    } catch (err) {
+        console.error("Checkout error:", err);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+
+
+
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+

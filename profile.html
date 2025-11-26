@@ -136,18 +136,11 @@
                 <div class="info-value" id="detailPhone"></div>
             </div>
 
-            <hr>
-
-            <div class="section-title">My Orders</div>
-            <div id="ordersContainer">
-                <p>Loading orders...</p>
-            </div>
-
-            <hr>
 
             <div class="section-title">About</div>
             <p style="color:#2d6a4f;">
-                Your profile details are securely stored locally. Orders are fetched from the backend.
+               Your profile details are securely stored in Database.
+                You can update them anytime using the “Edit Profile” option from the navbar menu.
             </p>
 
             <a href="index.html" class="btn btn-success home-btn">Back to Home</a>
@@ -156,6 +149,10 @@
     </div>
 
     <!-- Inline script removed; logic is in script.js -->
+    <script src="script.js"></script>
+    <script>
+  document.addEventListener("DOMContentLoaded", populateProfilePage);
+</script>
 
 </body>
 

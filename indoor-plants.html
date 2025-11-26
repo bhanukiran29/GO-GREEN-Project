@@ -148,8 +148,8 @@
                 <p>₹399</p>
 
                 <div class="btn-box">
-                    <button class="btn cart-btn" onclick="addToCart('Areca Palm',399,'img/indoor4.jpg')">Add to Cart</button>
-                    <button class="btn buy-btn" onclick="buyNow('Areca Palm',399,'img/indoor4.jpg')">Buy Now</button>
+                    <button class="btn cart-btn" onclick="addToCart('Areca Palm',399,'i104.jpg')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('Areca Palm',399,'i104.jpg')">Buy Now</button>
                 </div>
             </div>
 
@@ -162,19 +162,18 @@
 
 <script>
 function buyNow(name, price, img) {
-    // Save only this 1 product for direct purchase
     const directOrder = [{
-        name: name,
-        price: price,
-        img: img,
+        name,
+        price,
+        img,
         quantity: 1
     }];
 
-    // Save to localStorage
+    // Save direct product
     localStorage.setItem("directBuyItem", JSON.stringify(directOrder));
 
-    // Redirect to checkout form (order form page)
-    window.location.href = "order-form.html";
+    // Redirect to REAL checkout page
+    window.location.href = "checkout.html";
 }
 
 

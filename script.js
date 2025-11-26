@@ -151,7 +151,7 @@ async function loginUser() {
 
 /* ---------- USER MENU & PROFILE helpers ---------- */
 
-function refreshUserMenu() {
+async function refreshUserMenu() {
   const userMenuEl = document.getElementById("userMenu");
   const loginLinkEl = document.getElementById("navLoginLink");
 
@@ -164,24 +164,31 @@ function refreshUserMenu() {
   // User is logged in
   if (loginLinkEl) loginLinkEl.style.display = "none";
 
-  const name = sessionStorage.getItem("userName") || "User";
-  const email = sessionStorage.getItem("userEmail") || "";
-  const initial = (name && name.trim().charAt(0).toUpperCase()) || "U";
+  
+  const userId = getUserId();
 
-  const mName = document.getElementById("menuUserName");
-  const mEmail = document.getElementById("menuUserEmail");
-  const navAvatar = document.getElementById("navAvatar");
-  const menuAvatar = document.getElementById("menuAvatar");
+  // Fetch fresh data from backend
+  const res = await fetch(`${API_URL}/auth/user/${userId}`);
+  const user = await res.json();
 
-  if (mName) mName.innerText = name;
-  if (mEmail) mEmail.innerText = email;
-  if (navAvatar) navAvatar.innerText = initial;
-  if (menuAvatar) menuAvatar.innerText = initial;
+  const name = user.name || "User";
+  const email = user.email || "";
+  const initial = name.trim().charAt(0).toUpperCase();
 
-  if (userMenuEl) userMenuEl.style.display = "block";
+  // Update session
+  sessionStorage.setItem("userName", name);
+  sessionStorage.setItem("userEmail", email);
+
+  // Update navbar UI
+  document.getElementById("menuUserName").innerText = name;
+  document.getElementById("menuUserEmail").innerText = email;
+  document.getElementById("navAvatar").innerText = initial;
+  document.getElementById("menuAvatar").innerText = initial;
+
+  userMenuEl.style.display = "block";
 
   try {
-    if (window.location.pathname.endsWith("profile.html")) {
+    if (window.location.pathname.includes("profile.html")) {
       populateProfilePage();
     }
   } catch (e) { /* ignore */ }
@@ -197,108 +204,112 @@ function logoutUser() {
 
 /* ---------- Edit Profile Modal handlers ---------- */
 
-function openEditProfileModal() {
-  const userId = getUserId();
-  if (!userId) return alert("Please login first.");
+async function openEditProfileModal() {
+    const userId = sessionStorage.getItem("userId");
+    if (!userId) {
+        alert("You are not logged in");
+        return;
+    }
 
-  // Fetch current user data
-  fetch(`${API_URL}/auth/user/${userId}`)
-    .then(res => res.json())
-    .then(user => {
-      document.getElementById("editName").value = user.name || "";
-      document.getElementById("editEmail").value = user.email || "";
-      document.getElementById("editPhone").value = user.phone || "";
-      document.getElementById("editPassword").value = "********";
+    try {
+        // Fetch fresh backend user data
+        const res = await fetch(`${API_URL}/auth/user/${userId}`);
+        const user = await res.json();
 
-      if (window.jQuery) {
-        $('#editProfileModal').modal('show');
-      } else {
-        alert("Bootstrap modal required.");
-      }
-    })
-    .catch(err => {
-      console.error("Error loading profile:", err);
-      alert("Error loading profile data.");
-    });
+        if (!res.ok || !user || !user.name) {
+            console.error("Failed to load user:", user);
+            return; // REMOVE alert popup
+        }
+
+        // Fill modal fields
+        document.getElementById("editName").value = user.name || "";
+        document.getElementById("editEmail").value = user.email || "";
+        document.getElementById("editPhone").value = user.phone || "";
+        document.getElementById("editPassword").value = "********";
+
+       
+
+    } catch (err) {
+        console.error("Error fetching edit profile data:", err);
+        // NO alert here – avoid showing popup
+    }
 }
+
 
 
 async function saveProfileEdits() {
-  const name = (document.getElementById("editName") || {}).value.trim();
-  const email = (document.getElementById("editEmail") || {}).value.trim();
-  const phone = (document.getElementById("editPhone") || {}).value.trim();
-  const password = (document.getElementById("editPassword") || {}).value.trim();
+  const name = document.getElementById("editName").value.trim();
+  const email = document.getElementById("editEmail").value.trim();
+  const phone = document.getElementById("editPhone").value.trim();
+  const password = document.getElementById("editPassword").value.trim();
 
-  const raw = localStorage.getItem("userData");
-  if (!raw) return alert("No user data found.");
-  const currentUser = JSON.parse(raw);
-
-  if (email !== currentUser.email) {
-    if (!confirm("Changing your email will require you to login again with the new email. Continue?")) {
-      return false;
-    }
-  }
-
-  if (!name || !email) {
-    alert("Name and email are required.");
-    return false;
-  }
-
-  // raw is already declared above
-  // const raw = localStorage.getItem("userData"); 
-  // if (!raw) return alert("No user data found.");
-  // const user = JSON.parse(raw);
+  const userId = sessionStorage.getItem("userId");
+  if (!userId) return alert("You are not logged in.");
 
   try {
-    const res = await fetch(`${API_URL}/auth/update`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        _id: currentUser._id, // Use currentUser from above
-        name,
-        email,
-        phone,
-        password: password === "********" ? undefined : password
-      })
-    });
-    const data = await res.json();
+      const updateData = {
+          
+          name,
+          email,
+          phone,
+          password: password === "********" ? undefined : password
+      };
 
-    if (res.ok) {
-      localStorage.setItem("userData", JSON.stringify(data.user));
-      refreshUserMenu();
+      // ⭐⭐ IMPORTANT: Correct API route based on your backend
+      const res = await fetch(`${API_URL}/auth/update-profile/${userId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updateData)
+      });
 
-      // Immediate UI update for profile page if we are on it
-      if (document.getElementById("profileName")) document.getElementById("profileName").innerText = data.user.name;
-      if (document.getElementById("profileEmail")) document.getElementById("profileEmail").innerText = data.user.email;
-      if (document.getElementById("profilePhone")) document.getElementById("profilePhone").innerText = "📞 " + data.user.phone;
-      if (document.getElementById("detailName")) document.getElementById("detailName").innerText = data.user.name;
-      if (document.getElementById("detailEmail")) document.getElementById("detailEmail").innerText = data.user.email;
-      if (document.getElementById("detailPhone")) document.getElementById("detailPhone").innerText = data.user.phone;
+      const data = await res.json();
 
-      if (window.jQuery) $('#editProfileModal').modal('hide');
-
-      if (email !== currentUser.email) {
-        alert("Email updated! Please login with your new email.");
-        logoutUser();
-        return;
+      if (!res.ok) {
+          alert(data.message || "Failed to update profile");
+          return;
       }
 
-      alert("Profile updated successfully!");
-    } else {
-      alert(data.message || "Update failed");
-    }
+      alert("Profile updated!");
+
+      // Close modal
+      if (window.jQuery) {
+        $("#editProfileModal").modal("hide");
+      }
+
+      // Save new values into session
+      sessionStorage.setItem("userName", data.user.name);
+      sessionStorage.setItem("userEmail", data.user.email);
+
+    setTimeout(() => {
+      refreshUserMenu();
+      populateProfilePage();
+       // close modal
+    }, 300);   // 300–500ms works perfectly
+     $("#editProfileModal").modal("hide");
+
   } catch (err) {
-    alert("Error connecting to server");
-  }
-  return false;
+    console.error("Profile update secondary error:", err);
+    // No alert – avoid false popup
 }
+  
+
+}
+
+
+
 
 /* ---------- Profile page population ---------- */
 async function populateProfilePage() {
-  const raw = localStorage.getItem("userData");
-  if (!raw) return;
+  const userId = sessionStorage.getItem("userId");
+if (!userId) {
+    alert("You are not logged in");
+    window.location.href = "login.html";
+    return;
+}
 
-  const user = JSON.parse(raw);
+  const res = await fetch(`${API_URL}/auth/user/${userId}`);
+  const user = await res.json();
+
   const name = user.name || "User";
   const email = user.email || "";
   const phone = user.phone || "Not provided";
@@ -531,51 +542,40 @@ async function decreaseQty(productId) {
 async function removeItem(productId) {
   await removeFromCart(productId);
 }
+// //  updated
+// async function checkout() {
+//     const userId = getUserId();
+//     if (!userId) {
+//         alert("Please login to checkout.");
+//         return window.location.href = "login.html";
+//     }
 
-async function checkout() {
-  const cart = await _fetchCart();
-  if (!cart.length) {
-    alert("Your cart is empty.");
-    return;
-  }
+//     try {
+//         const res = await fetch(`${API_URL}/checkout`, {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify({
+//                 userId,
+//                 address: JSON.parse(localStorage.getItem("selectedAddress")) || null
+//             })
+//         });
 
-  const userId = getUserId();
-  if (!userId) {
-    alert("Please login to checkout.");
-    window.location.href = "login.html";
-    return;
-  }
+//         const data = await res.json();
 
-  try {
-    const total = await getCartTotal();
-    const res = await fetch(`${API_URL}/orders`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId,
-        items: cart,
-        total
-      })
-    });
+//         if (!res.ok) {
+//             alert(data.message || "Checkout failed.");
+//             return;
+//         }
 
-    const data = await res.json();
+//         // Redirect with orderId
+//         window.location.href = "order-success.html?orderId=" + data.orderId;
 
-    if (res.ok) {
-      // Clear cart via backend
-      await fetch(`${API_URL}/cart/clear/${userId}`, { method: "DELETE" });
+//     } catch (err) {
+//         console.error("Checkout error:", err);
+//         alert("Server error");
+//     }
+// }
 
-      const container = document.getElementById("cartContainer");
-      if (container) container.innerHTML = "<h3>Your cart is empty.</h3>";
-      await refreshCartBadge();
-      alert("Order placed successfully!");
-      window.location.reload();
-    } else {
-      alert(data.message || "Order failed");
-    }
-  } catch (err) {
-    alert("Error connecting to server");
-  }
-}
 
 async function refreshCartBadge() {
   const cart = await _fetchCart();
@@ -615,3 +615,27 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+/* ---------- BUY NOW (Single Product Checkout) ---------- */
+function buyNow(name, price, img) {
+    const userId = getUserId();
+    if (!userId) {
+        alert("Please login first");
+        window.location.href = "login.html";
+        return;
+    }
+
+    // Save single-product checkout data
+    const singleItem = {
+        productId: "p" + Date.now(),
+        name,
+        price: Number(price),
+        img,
+        qty: 1
+    };
+
+    localStorage.setItem("checkoutSingle", JSON.stringify(singleItem));
+
+    // Go to checkout page
+    window.location.href = "checkout.html";
+}
