@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ECO FRIENDLY PRODUCTS</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            background: #e8f8e4;
+            font-family: Poppins, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1b4332;
+            font-size: 40px;
+            margin-top: 30px;
+        }
+
+        .subcat-container {
+            width: 90%;
+            margin: auto;
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 35px;
+        }
+
+        .subcat-card {
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.3s ease;
+            text-align: center;
+        }
+
+        .subcat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .subcat-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .subcat-card h2 {
+            padding: 15px;
+            font-size: 24px;
+            color: #1b4332;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🌱 Eco-Friendly PRODUCTS</h1>
+
+    <div class="subcat-container">
+
+        <div class="subcat-card" onclick="location.href='reusable.html'">
+            <img src="m2.webp">
+            <h2>reusable and zero waste products </h2>
+        </div>
+
+        <div class="subcat-card" onclick="location.href='cleaning.html'">
+            <img src="m3.jpg">
+            <h2> Eco-Friendly Home & Cleaning Supplies</h2>
+        </div>
+
+        <div class="subcat-card" onclick="location.href='sustainable.html'">
+            <img src="m4.png">
+            <h2> Sustainable Energy & Tech Accessories</h2>
+        </div>
+
+        <div class="subcat-card" onclick="location.href='kitchen.html'">
+            <img src="m5.jpeg">
+            <h2>Eco-Friendly Kitchen & Food Storage</h2>
+        </div>
+
+    </div>
+
+</body>
+</html>

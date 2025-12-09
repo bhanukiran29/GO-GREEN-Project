@@ -151,7 +151,7 @@ async function loginUser() {
 
 /* ---------- USER MENU & PROFILE helpers ---------- */
 
-function refreshUserMenu() {
+async function refreshUserMenu() {
   const userMenuEl = document.getElementById("userMenu");
   const loginLinkEl = document.getElementById("navLoginLink");
 
@@ -164,24 +164,34 @@ function refreshUserMenu() {
   // User is logged in
   if (loginLinkEl) loginLinkEl.style.display = "none";
 
-  const name = sessionStorage.getItem("userName") || "User";
-  const email = sessionStorage.getItem("userEmail") || "";
-  const initial = (name && name.trim().charAt(0).toUpperCase()) || "U";
+  
+  const userId = getUserId();
 
-  const mName = document.getElementById("menuUserName");
-  const mEmail = document.getElementById("menuUserEmail");
+  // Fetch fresh data from backend
+  const res = await fetch(`${API_URL}/auth/user/${userId}`);
+  const user = await res.json();
+
+  const name = user.name || "User";
+  const email = user.email || "";
+  const initial = name.trim().charAt(0).toUpperCase();
+
+  // Update session
+  sessionStorage.setItem("userName", name);
+  sessionStorage.setItem("userEmail", email);
+
+  const menuUserName = document.getElementById("menuUserName");
+  const menuUserEmail = document.getElementById("menuUserEmail");
   const navAvatar = document.getElementById("navAvatar");
   const menuAvatar = document.getElementById("menuAvatar");
 
-  if (mName) mName.innerText = name;
-  if (mEmail) mEmail.innerText = email;
+  if (menuUserName) menuUserName.innerText = name;
+  if (menuUserEmail) menuUserEmail.innerText = email;
   if (navAvatar) navAvatar.innerText = initial;
   if (menuAvatar) menuAvatar.innerText = initial;
-
   if (userMenuEl) userMenuEl.style.display = "block";
 
   try {
-    if (window.location.pathname.endsWith("profile.html")) {
+    if (window.location.pathname.includes("profile.html")) {
       populateProfilePage();
     }
   } catch (e) { /* ignore */ }
@@ -197,33 +207,41 @@ function logoutUser() {
 
 /* ---------- Edit Profile Modal handlers ---------- */
 
-function openEditProfileModal() {
-  const userId = getUserId();
-  if (!userId) return alert("Please login first.");
+async function openEditProfileModal() {
+    const userId = sessionStorage.getItem("userId");
+    if (!userId) {
+        alert("You are not logged in");
+        return;
+    }
 
-  // Fetch current user data
-  fetch(`${API_URL}/auth/user/${userId}`)
-    .then(res => res.json())
-    .then(user => {
-      document.getElementById("editName").value = user.name || "";
-      document.getElementById("editEmail").value = user.email || "";
-      document.getElementById("editPhone").value = user.phone || "";
-      document.getElementById("editPassword").value = "********";
+    try {
+        // Fetch fresh backend user data
+        const res = await fetch(`${API_URL}/auth/user/${userId}`);
+        const user = await res.json();
 
-      if (window.jQuery) {
-        $('#editProfileModal').modal('show');
-      } else {
-        alert("Bootstrap modal required.");
-      }
-    })
-    .catch(err => {
-      console.error("Error loading profile:", err);
-      alert("Error loading profile data.");
-    });
+        if (!res.ok || !user || !user.name) {
+            console.error("Failed to load user:", user);
+            return; // REMOVE alert popup
+        }
+
+        // Fill modal fields
+        document.getElementById("editName").value = user.name || "";
+        document.getElementById("editEmail").value = user.email || "";
+        document.getElementById("editPhone").value = user.phone || "";
+        document.getElementById("editPassword").value = "********";
+
+       
+
+    } catch (err) {
+        console.error("Error fetching edit profile data:", err);
+        // NO alert here – avoid showing popup
+    }
 }
 
 
+
 async function saveProfileEdits() {
+<<<<<<< HEAD
   const userId = getUserId();
   if (!userId) return alert("Please login first.");
 
@@ -286,21 +304,78 @@ async function saveProfileEdits() {
         alert("Email updated! Please login with your new email.");
         logoutUser();
         return;
+=======
+  const name = document.getElementById("editName").value.trim();
+  const email = document.getElementById("editEmail").value.trim();
+  const phone = document.getElementById("editPhone").value.trim();
+  const password = document.getElementById("editPassword").value.trim();
+
+  const userId = sessionStorage.getItem("userId");
+  if (!userId) return alert("You are not logged in.");
+
+  try {
+      const updateData = {
+          
+          name,
+          email,
+          phone,
+          password: password === "********" ? undefined : password
+      };
+
+      // ⭐⭐ IMPORTANT: Correct API route based on your backend
+      const res = await fetch(`${API_URL}/auth/update-profile/${userId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updateData)
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+          alert(data.message || "Failed to update profile");
+          return;
+>>>>>>> 71ef4223fd95aa215fc30848ce9205cade3e54fd
       }
 
-      alert("Profile updated successfully!");
-    } else {
-      alert(data.message || "Update failed");
-    }
+      alert("Profile updated!");
+
+      // Close modal
+      if (window.jQuery) {
+        $("#editProfileModal").modal("hide");
+      }
+
+      // Save new values into session
+      sessionStorage.setItem("userName", data.user.name);
+      sessionStorage.setItem("userEmail", data.user.email);
+
+    setTimeout(() => {
+      refreshUserMenu();
+      populateProfilePage();
+       // close modal
+    }, 300);   // 300–500ms works perfectly
+     $("#editProfileModal").modal("hide");
+
   } catch (err) {
+<<<<<<< HEAD
     console.error(err);
     alert("Error connecting to server");
   }
   return false;
+=======
+    console.error("Profile update secondary error:", err);
+    // No alert – avoid false popup
+>>>>>>> 71ef4223fd95aa215fc30848ce9205cade3e54fd
 }
+  
+
+}
+
+
+
 
 /* ---------- Profile page population ---------- */
 async function populateProfilePage() {
+<<<<<<< HEAD
   const userId = getUserId();
   if (!userId) {
     // Not logged in
@@ -313,6 +388,22 @@ async function populateProfilePage() {
   try {
     const res = await fetch(`${API_URL}/auth/user/${userId}`);
     const user = await res.json();
+=======
+  const userId = sessionStorage.getItem("userId");
+if (!userId) {
+    alert("You are not logged in");
+    window.location.href = "login.html";
+    return;
+}
+
+  const res = await fetch(`${API_URL}/auth/user/${userId}`);
+  const user = await res.json();
+
+  const name = user.name || "User";
+  const email = user.email || "";
+  const phone = user.phone || "Not provided";
+  const initial = (name.trim().charAt(0) || "U").toUpperCase();
+>>>>>>> 71ef4223fd95aa215fc30848ce9205cade3e54fd
 
     if (!res.ok) {
       console.error("Error fetching user:", user);
@@ -550,51 +641,40 @@ async function decreaseQty(productId) {
 async function removeItem(productId) {
   await removeFromCart(productId);
 }
-
+// //  updated
 async function checkout() {
-  const cart = await _fetchCart();
-  if (!cart.length) {
-    alert("Your cart is empty.");
-    return;
-  }
-
-  const userId = getUserId();
-  if (!userId) {
-    alert("Please login to checkout.");
-    window.location.href = "login.html";
-    return;
-  }
-
-  try {
-    const total = await getCartTotal();
-    const res = await fetch(`${API_URL}/orders`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId,
-        items: cart,
-        total
-      })
-    });
-
-    const data = await res.json();
-
-    if (res.ok) {
-      // Clear cart via backend
-      await fetch(`${API_URL}/cart/clear/${userId}`, { method: "DELETE" });
-
-      const container = document.getElementById("cartContainer");
-      if (container) container.innerHTML = "<h3>Your cart is empty.</h3>";
-      await refreshCartBadge();
-      alert("Order placed successfully!");
-      window.location.reload();
-    } else {
-      alert(data.message || "Order failed");
+    const userId = getUserId();
+    if (!userId) {
+        alert("Please login to checkout.");
+        return window.location.href = "login.html";
     }
-  } catch (err) {
-    alert("Error connecting to server");
-  }
+
+    try {
+        const res = await fetch(`${API_URL}/checkout`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                userId,
+                address: JSON.parse(localStorage.getItem("selectedAddress")) || null
+            })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.message || "Checkout failed.");
+            return;
+        }
+
+        // Redirect with orderId
+        window.location.href = "order-success.html?orderId=" + data.orderId;
+
+    } catch (err) {
+        console.error("Checkout error:", err);
+        alert("Server error");
+    }
 }
+
 
 async function refreshCartBadge() {
   const cart = await _fetchCart();
@@ -634,3 +714,181 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+/* ---------- BUY NOW (Single Product Checkout) ---------- */
+/* BUY NOW from Product Page */
+function buyNow(name, price, img) {
+    const userId = getUserId();
+    if (!userId) {
+        alert("Please login");
+        window.location.href = "login.html";
+        return;
+    }
+
+    localStorage.setItem("checkoutMode", "single");
+    localStorage.setItem("checkoutSingle", JSON.stringify({
+        name,
+        price,
+        img,
+        qty: 1
+    }));
+
+    window.location.href = "checkout.html";
+}
+
+/* BUY NOW from Cart Page */
+function buyNowItem(productId) {
+    // we are buying from CART, so ignore any previous product-page Buy Now
+    localStorage.setItem("checkoutMode", "single");
+    localStorage.removeItem("checkoutSingle");          // 👈 important
+    localStorage.setItem("checkoutSingleProductId", productId);
+
+    window.location.href = "checkout.html";
+}
+
+
+/* BUY ALL from Cart Page */
+function buyNowAll() {
+    localStorage.setItem("checkoutMode", "cart");
+    localStorage.removeItem("checkoutSingle");
+    localStorage.removeItem("checkoutSingleProductId");
+    window.location.href = "checkout.html";
+}
+
+/* CHECKOUT PAGE LOADER */
+document.addEventListener("DOMContentLoaded", async () => {
+    if (!window.location.pathname.includes("checkout.html")) return;
+
+    const userId = getUserId();
+    const mode = localStorage.getItem("checkoutMode");
+    const orderBox = document.getElementById("orderDetails");
+    const totalBox = document.getElementById("grandTotal");
+
+    console.log("Checkout mode:", mode);
+
+    if (mode === "single") {
+        let item = JSON.parse(localStorage.getItem("checkoutSingle"));
+        if (!item) {
+            const pid = localStorage.getItem("checkoutSingleProductId");
+            const res = await fetch(`${API_URL}/cart/${userId}`);
+            const data = await res.json();
+            item = data.items.find(i => i.productId === pid);
+        }
+
+        if (!item) return orderBox.innerHTML = `<p>No product selected.</p>`;
+
+        const subtotal = item.price * (item.qty || 1);
+        orderBox.innerHTML = `
+            <div class="item-row">
+                <img src="${item.img}">
+                <div class="item-info">
+                    <h4>${item.name}</h4>
+                    <p>₹${item.price} × ${item.qty || 1} = ₹${subtotal}</p>
+                </div>
+            </div>`;
+        totalBox.innerText = "₹" + subtotal;
+        return;
+    }
+
+    if (mode === "cart") {
+        const res = await fetch(`${API_URL}/cart/${userId}`);
+        const data = await res.json();
+        const cart = data.items;
+
+        let html = "";
+        let total = 0;
+
+        cart.forEach(item => {
+            const qty = item.qty || 1;
+            const subtotal = item.price * qty;
+            html += `
+            <div class="item-row">
+                <img src="${item.img}">
+                <div class="item-info">
+                    <h4>${item.name}</h4>
+                    <p>₹${item.price} × ${qty} = ₹${subtotal}</p>
+                </div>
+            </div>`;
+            total += subtotal;
+        });
+
+        orderBox.innerHTML = html;
+        totalBox.innerText = "₹" + total;
+    }
+});
+/* ===== PLACE ORDER FUNCTION ===== */
+async function placeOrder() {
+    const userId = getUserId();
+    if (!userId) return alert("Login first!");
+
+    const fullName = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const state = document.getElementById("state").value.trim();
+    const district = document.getElementById("district").value.trim();
+    const city = document.getElementById("city").value.trim();
+    const street = document.getElementById("street").value.trim();
+    const pincode = document.getElementById("pincode").value.trim();
+
+    if (!fullName || !phone || !state || !district || !city || !street || !pincode) {
+        return alert("Please fill all delivery details!");
+    }
+
+    const mode = localStorage.getItem("checkoutMode");
+    let items = [];
+
+    // ⭐ ALWAYS get product data from CART DB for reliability
+    const resCart = await fetch(`${API_URL}/cart/${userId}`);
+    const cartData = await resCart.json();
+
+    if (mode === "single") {
+        const pid = localStorage.getItem("checkoutSingleProductId");
+        if (pid) {
+            items = cartData.items.filter(i => i.productId === pid);
+        } else {
+            items = cartData.items; // fallback
+        }
+    } else {
+        items = cartData.items; // full cart buy
+    }
+
+    if (!items.length) return alert("No items to order!");
+
+    const total = items.reduce((sum, item) => sum + (item.price * (item.qty || 1)), 0);
+
+    const orderPayload = {
+        userId,
+        items,
+        total,
+        date: new Date(),
+        address: { fullName, phone, state, district, city, street, pincode }
+    };
+
+    const res = await fetch(`${API_URL}/orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderPayload)
+    });
+
+    if (!res.ok) {
+        console.error("Order create error", await res.text());
+        return alert("Order failed!");
+    }
+
+    // Clear only purchased items
+    if (mode === "single") {
+        const pid = localStorage.getItem("checkoutSingleProductId");
+        await fetch(`${API_URL}/cart/remove`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, productId: pid })
+        });
+    } else {
+        await fetch(`${API_URL}/cart/clear/${userId}`, { method: "DELETE" });
+    }
+
+    localStorage.removeItem("checkoutMode");
+    localStorage.removeItem("checkoutSingleProductId");
+
+    alert("🎉 Order placed successfully!");
+    window.location.href = "orders.html";
+}
