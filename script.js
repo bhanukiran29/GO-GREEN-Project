@@ -179,13 +179,16 @@ async function refreshUserMenu() {
   sessionStorage.setItem("userName", name);
   sessionStorage.setItem("userEmail", email);
 
-  // Update navbar UI
-  document.getElementById("menuUserName").innerText = name;
-  document.getElementById("menuUserEmail").innerText = email;
-  document.getElementById("navAvatar").innerText = initial;
-  document.getElementById("menuAvatar").innerText = initial;
+  const menuUserName = document.getElementById("menuUserName");
+  const menuUserEmail = document.getElementById("menuUserEmail");
+  const navAvatar = document.getElementById("navAvatar");
+  const menuAvatar = document.getElementById("menuAvatar");
 
-  userMenuEl.style.display = "block";
+  if (menuUserName) menuUserName.innerText = name;
+  if (menuUserEmail) menuUserEmail.innerText = email;
+  if (navAvatar) navAvatar.innerText = initial;
+  if (menuAvatar) menuAvatar.innerText = initial;
+  if (userMenuEl) userMenuEl.style.display = "block";
 
   try {
     if (window.location.pathname.includes("profile.html")) {
@@ -543,38 +546,38 @@ async function removeItem(productId) {
   await removeFromCart(productId);
 }
 // //  updated
-// async function checkout() {
-//     const userId = getUserId();
-//     if (!userId) {
-//         alert("Please login to checkout.");
-//         return window.location.href = "login.html";
-//     }
+async function checkout() {
+    const userId = getUserId();
+    if (!userId) {
+        alert("Please login to checkout.");
+        return window.location.href = "login.html";
+    }
 
-//     try {
-//         const res = await fetch(`${API_URL}/checkout`, {
-//             method: "POST",
-//             headers: { "Content-Type": "application/json" },
-//             body: JSON.stringify({
-//                 userId,
-//                 address: JSON.parse(localStorage.getItem("selectedAddress")) || null
-//             })
-//         });
+    try {
+        const res = await fetch(`${API_URL}/checkout`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                userId,
+                address: JSON.parse(localStorage.getItem("selectedAddress")) || null
+            })
+        });
 
-//         const data = await res.json();
+        const data = await res.json();
 
-//         if (!res.ok) {
-//             alert(data.message || "Checkout failed.");
-//             return;
-//         }
+        if (!res.ok) {
+            alert(data.message || "Checkout failed.");
+            return;
+        }
 
-//         // Redirect with orderId
-//         window.location.href = "order-success.html?orderId=" + data.orderId;
+        // Redirect with orderId
+        window.location.href = "order-success.html?orderId=" + data.orderId;
 
-//     } catch (err) {
-//         console.error("Checkout error:", err);
-//         alert("Server error");
-//     }
-// }
+    } catch (err) {
+        console.error("Checkout error:", err);
+        alert("Server error");
+    }
+}
 
 
 async function refreshCartBadge() {
@@ -617,25 +620,179 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 /* ---------- BUY NOW (Single Product Checkout) ---------- */
+/* BUY NOW from Product Page */
 function buyNow(name, price, img) {
     const userId = getUserId();
     if (!userId) {
-        alert("Please login first");
+        alert("Please login");
         window.location.href = "login.html";
         return;
     }
 
-    // Save single-product checkout data
-    const singleItem = {
-        productId: "p" + Date.now(),
+    localStorage.setItem("checkoutMode", "single");
+    localStorage.setItem("checkoutSingle", JSON.stringify({
         name,
-        price: Number(price),
+        price,
         img,
         qty: 1
+    }));
+
+    window.location.href = "checkout.html";
+}
+
+/* BUY NOW from Cart Page */
+function buyNowItem(productId) {
+    // we are buying from CART, so ignore any previous product-page Buy Now
+    localStorage.setItem("checkoutMode", "single");
+    localStorage.removeItem("checkoutSingle");          // 👈 important
+    localStorage.setItem("checkoutSingleProductId", productId);
+
+    window.location.href = "checkout.html";
+}
+
+
+/* BUY ALL from Cart Page */
+function buyNowAll() {
+    localStorage.setItem("checkoutMode", "cart");
+    localStorage.removeItem("checkoutSingle");
+    localStorage.removeItem("checkoutSingleProductId");
+    window.location.href = "checkout.html";
+}
+
+/* CHECKOUT PAGE LOADER */
+document.addEventListener("DOMContentLoaded", async () => {
+    if (!window.location.pathname.includes("checkout.html")) return;
+
+    const userId = getUserId();
+    const mode = localStorage.getItem("checkoutMode");
+    const orderBox = document.getElementById("orderDetails");
+    const totalBox = document.getElementById("grandTotal");
+
+    console.log("Checkout mode:", mode);
+
+    if (mode === "single") {
+        let item = JSON.parse(localStorage.getItem("checkoutSingle"));
+        if (!item) {
+            const pid = localStorage.getItem("checkoutSingleProductId");
+            const res = await fetch(`${API_URL}/cart/${userId}`);
+            const data = await res.json();
+            item = data.items.find(i => i.productId === pid);
+        }
+
+        if (!item) return orderBox.innerHTML = `<p>No product selected.</p>`;
+
+        const subtotal = item.price * (item.qty || 1);
+        orderBox.innerHTML = `
+            <div class="item-row">
+                <img src="${item.img}">
+                <div class="item-info">
+                    <h4>${item.name}</h4>
+                    <p>₹${item.price} × ${item.qty || 1} = ₹${subtotal}</p>
+                </div>
+            </div>`;
+        totalBox.innerText = "₹" + subtotal;
+        return;
+    }
+
+    if (mode === "cart") {
+        const res = await fetch(`${API_URL}/cart/${userId}`);
+        const data = await res.json();
+        const cart = data.items;
+
+        let html = "";
+        let total = 0;
+
+        cart.forEach(item => {
+            const qty = item.qty || 1;
+            const subtotal = item.price * qty;
+            html += `
+            <div class="item-row">
+                <img src="${item.img}">
+                <div class="item-info">
+                    <h4>${item.name}</h4>
+                    <p>₹${item.price} × ${qty} = ₹${subtotal}</p>
+                </div>
+            </div>`;
+            total += subtotal;
+        });
+
+        orderBox.innerHTML = html;
+        totalBox.innerText = "₹" + total;
+    }
+});
+/* ===== PLACE ORDER FUNCTION ===== */
+async function placeOrder() {
+    const userId = getUserId();
+    if (!userId) return alert("Login first!");
+
+    const fullName = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const state = document.getElementById("state").value.trim();
+    const district = document.getElementById("district").value.trim();
+    const city = document.getElementById("city").value.trim();
+    const street = document.getElementById("street").value.trim();
+    const pincode = document.getElementById("pincode").value.trim();
+
+    if (!fullName || !phone || !state || !district || !city || !street || !pincode) {
+        return alert("Please fill all delivery details!");
+    }
+
+    const mode = localStorage.getItem("checkoutMode");
+    let items = [];
+
+    // ⭐ ALWAYS get product data from CART DB for reliability
+    const resCart = await fetch(`${API_URL}/cart/${userId}`);
+    const cartData = await resCart.json();
+
+    if (mode === "single") {
+        const pid = localStorage.getItem("checkoutSingleProductId");
+        if (pid) {
+            items = cartData.items.filter(i => i.productId === pid);
+        } else {
+            items = cartData.items; // fallback
+        }
+    } else {
+        items = cartData.items; // full cart buy
+    }
+
+    if (!items.length) return alert("No items to order!");
+
+    const total = items.reduce((sum, item) => sum + (item.price * (item.qty || 1)), 0);
+
+    const orderPayload = {
+        userId,
+        items,
+        total,
+        date: new Date(),
+        address: { fullName, phone, state, district, city, street, pincode }
     };
 
-    localStorage.setItem("checkoutSingle", JSON.stringify(singleItem));
+    const res = await fetch(`${API_URL}/orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderPayload)
+    });
 
-    // Go to checkout page
-    window.location.href = "checkout.html";
+    if (!res.ok) {
+        console.error("Order create error", await res.text());
+        return alert("Order failed!");
+    }
+
+    // Clear only purchased items
+    if (mode === "single") {
+        const pid = localStorage.getItem("checkoutSingleProductId");
+        await fetch(`${API_URL}/cart/remove`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, productId: pid })
+        });
+    } else {
+        await fetch(`${API_URL}/cart/clear/${userId}`, { method: "DELETE" });
+    }
+
+    localStorage.removeItem("checkoutMode");
+    localStorage.removeItem("checkoutSingleProductId");
+
+    alert("🎉 Order placed successfully!");
+    window.location.href = "orders.html";
 }

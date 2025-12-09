@@ -160,27 +160,7 @@
     
 <script src="script.js"></script>
 
-<script>
-function buyNow(name, price, img) {
-    const directOrder = [{
-        name,
-        price,
-        img,
-        quantity: 1
-    }];
 
-    // Save direct product
-    localStorage.setItem("directBuyItem", JSON.stringify(directOrder));
-
-    // Redirect to REAL checkout page
-    window.location.href = "checkout.html";
-}
-
-
-
-
-        
-</script>
 
 </body>
 </html>

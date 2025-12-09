@@ -438,3 +438,34 @@ if (address?.productIds && Array.isArray(address.productIds)) {
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
+// Get all orders of a user
+app.get('/api/orders/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const orders = await ordersCollection.find({ userId }).toArray();
+    if (!orders.length) {
+      return res.json([]);
+    }
+    res.json(orders);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch orders" });
+  }
+});
+
+// delete order 
+const { ObjectId } = require('mongodb'); // ensure this exists on top
+
+// DELETE Order API
+// DELETE order
+app.delete('/api/orders/:orderId', async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        await Order.findByIdAndDelete(orderId);
+        res.json({ message: "Order deleted successfully" });
+    } catch (err) {
+        console.error("Delete order error:", err);
+        res.status(500).json({ error: "Failed to delete order" });
+    }
+});

@@ -56,7 +56,7 @@
         </div>
     </div>
 
-<script>
+ <script>
 /* CONFIG */
 const API_URL = "http://localhost:5002/api";
 
@@ -214,36 +214,37 @@ async function removeItem(productId) {
     }
 }
 
-/* Buy Now — save only the selected productId (string) */
+/* Buy Now — single item from CART */
 async function buyNowItem(productId) {
-    // Save productId strings only (checkout expects array of ids)
-    localStorage.setItem("checkoutItems", JSON.stringify([productId]));
-    // Redirect to checkout page
+    // We are buying a single cart item, not the last product-page Buy Now
+    localStorage.setItem("checkoutMode", "single");
+
+    // Very important: clear any previous product-page Buy Now data
+    localStorage.removeItem("checkoutSingle");
+
+    // Save ONLY this cart product id; checkout will use it to find item from cart
+    localStorage.setItem("checkoutSingleProductId", productId);
+
+    // Go to checkout
     window.location.href = "checkout.html";
 }
 
-/* Buy All — save all productId strings from cart */
+/* Buy All — all items from cart */
 async function buyNowAll() {
-    const cart = await getCart();
+    // Checkout should display all cart items
+    localStorage.setItem("checkoutMode", "cart");
 
-    if (!cart.length) {
-        alert("Your cart is empty!");
-        return;
-    }
+    // Clear any single-item data
+    localStorage.removeItem("checkoutSingle");
+    localStorage.removeItem("checkoutSingleProductId");
 
-    // Map to productId strings (ensure consistent format)
-    const productIds = cart.map(item => item.productId);
-
-    localStorage.setItem("checkoutItems", JSON.stringify(productIds));
     window.location.href = "checkout.html";
 }
 
-/* When an order is completed, backend currently clears the cart.
-   We rely on backend to clear. After returning from checkout-success
-   the user sees updated cart when page reloads.
-*/
+
+
 
 document.addEventListener("DOMContentLoaded", loadCart);
-</script>
+</script>    
 </body>
 </html>

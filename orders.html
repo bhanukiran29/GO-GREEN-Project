@@ -67,6 +67,60 @@
         font-size: 16px;
         margin-top: 20px;
     }
+
+    .order-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 7px rgba(0,0,0,0.07);
+}
+
+.order-item {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.order-item img {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.details h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.details p {
+    margin: 4px 0;
+    font-size: 14px;
+}
+
+.cancelBtn {
+    background: #c62828;
+    color: #fff;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.cancelBtn:hover {
+    background: #a61e1e;
+}
+
+hr {
+    display: none; /* remove extra line under each card */
+}
+
+
 </style>
 </head>
 <body>
@@ -76,31 +130,53 @@
     <div id="ordersContainer"></div>
     <a href="index.html" class="btn">Back to Home</a>
 </div>
-
 <script>
-function loadOrders() {
-    const ordersContainer = document.getElementById("ordersContainer");
-    const orders = JSON.parse(localStorage.getItem("orders")) || [];
+const API_URL = "http://localhost:5002/api";
+const userId = sessionStorage.getItem("userId");
+const ordersContainer = document.getElementById("ordersContainer");
 
-    if (orders.length === 0) {
+// Load Orders from Backend
+async function loadOrders() {
+    if (!userId) {
+        ordersContainer.innerHTML = `<p class="empty">Please login to view your orders.</p>`;
+        return;
+    }
+
+    const res = await fetch(`${API_URL}/orders/${userId}`);
+    const orders = await res.json();
+
+    if (!orders.length) {
         ordersContainer.innerHTML = `<p class="empty">No orders found.</p>`;
         return;
     }
 
-    ordersContainer.innerHTML = "";
+    ordersContainer.innerHTML = ""; // clear existing
 
     orders.reverse().forEach(order => {
+        const orderId = order._id;
+        const orderDate = new Date(order.date).toLocaleDateString();
+
         order.items.forEach(item => {
+            const qty = item.qty || 1;
+            const totalPrice = item.price * qty;
+
             const card = document.createElement("div");
             card.className = "order-card";
 
             card.innerHTML = `
-                <img src="${item.img}" alt="Product Image">
-                <div class="order-details">
-                    <strong>${item.name}</strong><br>
-                    ₹${item.price} × ${item.quantity} = <strong>₹${item.price * item.quantity}</strong>
-                    <div class="order-date">Ordered on: ${order.date}</div>
+                <div class="order-item">
+                    <img src="${item.img}" alt="${item.name}">
+                    <div class="details">
+                        <h3>${item.name}</h3>
+                        <p>₹${item.price} × ${qty} = <strong>₹${totalPrice}</strong></p>
+                        <small>Ordered on: ${orderDate}</small>
+                    </div>
                 </div>
+
+                <button class="cancelBtn" onclick="cancelOrder('${orderId}')">
+                    Cancel Order
+                </button>
+                <hr>
             `;
 
             ordersContainer.appendChild(card);
@@ -108,8 +184,28 @@ function loadOrders() {
     });
 }
 
+// Cancel Order from backend
+async function cancelOrder(orderId) {
+    if (!confirm("Are you sure you want to cancel this order?")) return;
+
+    const res = await fetch(`${API_URL}/orders/${orderId}`, {
+        method: "DELETE"
+    });
+
+    if (!res.ok) {
+        alert("Order cancellation failed!");
+        return;
+    }
+
+    alert("Order cancelled successfully!");
+    loadOrders(); // Refresh after deletion
+}
+
+// Load when page opens
 loadOrders();
 </script>
+
+
 
 </body>
 </html>
