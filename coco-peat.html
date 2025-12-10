@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>coco-peat</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            background: #e8f8e4;
+            font-family: Poppins, sans-serif;
+        }
+
+        .container {
+            width: 90%;
+            margin: auto;
+            margin-top: 40px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1b4332;
+            font-size: 38px;
+            margin-bottom: 30px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            padding-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+            transition: .3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .product-card h3 {
+            margin-top: 10px;
+            color: #1b4332;
+            font-size: 18px;
+        }
+
+        .product-card p {
+            color: green;
+            font-weight: 600;
+        }
+
+        .btn-box {
+            margin-top: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            border: none;
+        }
+
+        .cart-btn {
+            background: #1b4332;
+            color: white;
+        }
+
+        .cart-btn:hover {
+            background: #145c32;
+        }
+
+        .buy-btn {
+            background: #2d6a4f;
+            color: white;
+        }
+
+        .buy-btn:hover {
+            background: #1a4b35;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🌻coco-peat</h1>
+
+        <div class="product-grid">
+
+            <!-- PRODUCT 1 -->
+            <div class="product-card">
+                <img src="Y5.jpg">
+                <h3>COIR GARDEN - Cocopeat Block 650 GMS </h3>
+                <p>₹199</p>
+
+                <div class="btn-box">
+                    <button class="btn cart-btn" onclick="addToCart('COIR GARDEN - Cocopeat Block 650 GMS',199,'Y5.jpg')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('COIR GARDEN - Cocopeat Block 650 GMS',199,'Y5.jpg')">Buy Now</button>
+                </div>
+            </div>
+
+            <!-- PRODUCT 2 -->
+            <div class="product-card">
+                <img src="Y6.jpg">
+                <h3>Coco Coir Bricks Potting Soil</h3>
+                <p>₹249</p>
+
+                <div class="btn-box">
+                    <button class="btn cart-btn" onclick="addToCart('Coco Coir Bricks Potting Soil',249,'Y6.jpg')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('Coco Coir Bricks Potting Soil',249,'Y6.jpg')">Buy Now</button>
+                </div>
+            </div>
+
+            <!-- PRODUCT 3 -->
+            <div class="product-card">
+                <img src="Y7.jpg">
+                <h3>GardenTrails Premium Organic Coco Peat Powder</h3>
+                <p>₹379</p>
+
+                <div class="btn-box">
+                    <button class="btn cart-btn" onclick="addToCart('GardenTrails Premium Organic Coco Peat Powder',379,'Y7.jpg')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('GardenTrails Premium Organic Coco Peat Powder',379,'Y7.jpg')">Buy Now</button>
+                </div>
+            </div>
+
+            <!-- PRODUCT 4 -->
+            <div class="product-card">
+                <img src="Y8.jpg">
+                <h3>Jiffy Bags / Coco Peat Coins for Seed Germination</h3>
+                <p>₹199</p>
+
+                <div class="btn-box">
+                    <button class="btn cart-btn" onclick="addToCart('Jiffy Bags / Coco Peat Coins for Seed Germination',199,'Y8.jpg')">Add to Cart</button>
+                    <button class="btn buy-btn" onclick="buyNow('Jiffy Bags / Coco Peat Coins for Seed Germination',199,'Y8.jpg')">Buy Now</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    
+<script src="script.js"></script>
+
+<script>
+function buyNow(name, price, img) {
+    // Save only this 1 product for direct purchase
+    const directOrder = [{
+        name: name,
+        price: price,
+        img: img,
+        quantity: 1
+    }];
+
+    // Save to localStorage
+    localStorage.setItem("directBuyItem", JSON.stringify(directOrder));
+
+    // Redirect to checkout form (order form page)
+    window.location.href = "order-form.html";
+}
+
+
+
+
+        
+</script>
+
+</body>
+</html>
