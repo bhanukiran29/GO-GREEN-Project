@@ -241,7 +241,6 @@ async function openEditProfileModal() {
 
 
 async function saveProfileEdits() {
-<<<<<<< HEAD
   const userId = getUserId();
   if (!userId) return alert("Please login first.");
 
@@ -252,158 +251,71 @@ async function saveProfileEdits() {
 
   if (!name || !email) {
     alert("Name and email are required.");
-    return false;
+    return;
   }
 
-  // Check if email is changing (requires fetching current user data first if we want to be strict, 
-  // but for now we can just warn if the input email is different from session email)
   const currentEmail = sessionStorage.getItem("userEmail");
   if (currentEmail && email !== currentEmail) {
-    if (!confirm("Changing your email will require you to login again with the new email. Continue?")) {
-      return false;
+    if (!confirm("Changing your email will require you to login again. Continue?")) {
+      return;
     }
   }
 
   try {
-    const res = await fetch(`${API_URL}/auth/update`, {
+    const res = await fetch(`${API_URL}/auth/update-profile/${userId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        _id: userId,
         name,
         email,
         phone,
         password: password === "********" ? undefined : password
       })
     });
+
     const data = await res.json();
+    if (!res.ok) {
+      alert(data.message || "Failed to update profile");
+      return;
+    }
 
-    if (res.ok) {
-      // Update session storage
-      sessionStorage.setItem("userName", data.user.name);
-      sessionStorage.setItem("userEmail", data.user.email);
+    // Update UI + session
+    sessionStorage.setItem("userName", data.user.name);
+    sessionStorage.setItem("userEmail", data.user.email);
 
-      // Update localStorage cache if it exists, otherwise just ignore
-      if (localStorage.getItem("userData")) {
-        localStorage.setItem("userData", JSON.stringify(data.user));
-      }
+    alert("Profile updated successfully!");
 
-      refreshUserMenu();
+    refreshUserMenu();
+    populateProfilePage();
 
-      // Immediate UI update for profile page
-      if (document.getElementById("profileName")) document.getElementById("profileName").innerText = data.user.name;
-      if (document.getElementById("profileEmail")) document.getElementById("profileEmail").innerText = data.user.email;
-      if (document.getElementById("profilePhone")) document.getElementById("profilePhone").innerText = "📞 " + data.user.phone;
-      if (document.getElementById("detailName")) document.getElementById("detailName").innerText = data.user.name;
-      if (document.getElementById("detailEmail")) document.getElementById("detailEmail").innerText = data.user.email;
-      if (document.getElementById("detailPhone")) document.getElementById("detailPhone").innerText = data.user.phone;
+    if (window.jQuery) $("#editProfileModal").modal("hide");
 
-      if (window.jQuery) $('#editProfileModal').modal('hide');
-
-      if (currentEmail && email !== currentEmail) {
-        alert("Email updated! Please login with your new email.");
-        logoutUser();
-        return;
-=======
-  const name = document.getElementById("editName").value.trim();
-  const email = document.getElementById("editEmail").value.trim();
-  const phone = document.getElementById("editPhone").value.trim();
-  const password = document.getElementById("editPassword").value.trim();
-
-  const userId = sessionStorage.getItem("userId");
-  if (!userId) return alert("You are not logged in.");
-
-  try {
-      const updateData = {
-          
-          name,
-          email,
-          phone,
-          password: password === "********" ? undefined : password
-      };
-
-      // ⭐⭐ IMPORTANT: Correct API route based on your backend
-      const res = await fetch(`${API_URL}/auth/update-profile/${userId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updateData)
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-          alert(data.message || "Failed to update profile");
-          return;
->>>>>>> 71ef4223fd95aa215fc30848ce9205cade3e54fd
-      }
-
-      alert("Profile updated!");
-
-      // Close modal
-      if (window.jQuery) {
-        $("#editProfileModal").modal("hide");
-      }
-
-      // Save new values into session
-      sessionStorage.setItem("userName", data.user.name);
-      sessionStorage.setItem("userEmail", data.user.email);
-
-    setTimeout(() => {
-      refreshUserMenu();
-      populateProfilePage();
-       // close modal
-    }, 300);   // 300–500ms works perfectly
-     $("#editProfileModal").modal("hide");
+    // If email changed → force logout
+    if (currentEmail && email !== currentEmail) {
+      alert("Please login again using your updated email.");
+      logoutUser();
+    }
 
   } catch (err) {
-<<<<<<< HEAD
     console.error(err);
     alert("Error connecting to server");
   }
-  return false;
-=======
-    console.error("Profile update secondary error:", err);
-    // No alert – avoid false popup
->>>>>>> 71ef4223fd95aa215fc30848ce9205cade3e54fd
 }
-  
-
-}
-
-
 
 
 /* ---------- Profile page population ---------- */
 async function populateProfilePage() {
-<<<<<<< HEAD
   const userId = getUserId();
   if (!userId) {
-    // Not logged in
-    const ordersContainer = document.getElementById("ordersContainer");
-    if (ordersContainer) ordersContainer.innerHTML = "<p>Please login to view orders.</p>";
-    return;
-  }
-
-  // Fetch User Details from API
-  try {
-    const res = await fetch(`${API_URL}/auth/user/${userId}`);
-    const user = await res.json();
-=======
-  const userId = sessionStorage.getItem("userId");
-if (!userId) {
     alert("You are not logged in");
     window.location.href = "login.html";
     return;
-}
+  }
 
-  const res = await fetch(`${API_URL}/auth/user/${userId}`);
-  const user = await res.json();
-
-  const name = user.name || "User";
-  const email = user.email || "";
-  const phone = user.phone || "Not provided";
-  const initial = (name.trim().charAt(0) || "U").toUpperCase();
->>>>>>> 71ef4223fd95aa215fc30848ce9205cade3e54fd
+  /* --- Load User Details --- */
+  try {
+    const res = await fetch(`${API_URL}/auth/user/${userId}`);
+    const user = await res.json();
 
     if (!res.ok) {
       console.error("Error fetching user:", user);
@@ -411,25 +323,37 @@ if (!userId) {
     }
 
     const name = user.name || "User";
-    const email = user.email || "";
+    const email = user.email || "Not provided";
     const phone = user.phone || "Not provided";
-    const initial = (name.trim().charAt(0) || "U").toUpperCase();
+    const initial = name.charAt(0).toUpperCase();
 
-    // Populate User Details
-    if (document.getElementById("profileAvatar")) document.getElementById("profileAvatar").innerText = initial;
-    if (document.getElementById("profileName")) document.getElementById("profileName").innerText = name;
-    if (document.getElementById("profileEmail")) document.getElementById("profileEmail").innerText = email;
-    if (document.getElementById("profilePhone")) document.getElementById("profilePhone").innerText = "📞 " + phone;
+    // Update UI
+    if (document.getElementById("profileAvatar"))
+      document.getElementById("profileAvatar").innerText = initial;
 
-    if (document.getElementById("detailName")) document.getElementById("detailName").innerText = name;
-    if (document.getElementById("detailEmail")) document.getElementById("detailEmail").innerText = email;
-    if (document.getElementById("detailPhone")) document.getElementById("detailPhone").innerText = phone;
+    if (document.getElementById("profileName"))
+      document.getElementById("profileName").innerText = name;
+
+    if (document.getElementById("profileEmail"))
+      document.getElementById("profileEmail").innerText = email;
+
+    if (document.getElementById("profilePhone"))
+      document.getElementById("profilePhone").innerText = "📞 " + phone;
+
+    if (document.getElementById("detailName"))
+      document.getElementById("detailName").innerText = name;
+
+    if (document.getElementById("detailEmail"))
+      document.getElementById("detailEmail").innerText = email;
+
+    if (document.getElementById("detailPhone"))
+      document.getElementById("detailPhone").innerText = phone;
 
   } catch (err) {
     console.error("Error loading profile data:", err);
   }
 
-  // Fetch and Populate Orders
+  /* --- Load Orders --- */
   const ordersContainer = document.getElementById("ordersContainer");
   if (!ordersContainer) return;
 
@@ -445,22 +369,24 @@ if (!userId) {
     let html = '<div class="list-group">';
     orders.forEach(order => {
       const date = new Date(order.date).toLocaleDateString();
-      const total = order.total;
-      const itemCount = order.items.length;
-
       html += `
         <div class="list-group-item">
-          <h4 class="list-group-item-heading">Order #${order._id.slice(-6)} <small class="pull-right">${date}</small></h4>
+          <h4 class="list-group-item-heading">
+            Order #${order._id.slice(-6)}
+            <small class="pull-right">${date}</small>
+          </h4>
           <p class="list-group-item-text">
-            <strong>Items:</strong> ${itemCount} | <strong>Total:</strong> ₹${total}
+            <strong>Items:</strong> ${order.items.length} |
+            <strong>Total:</strong> ₹${order.total}
           </p>
-        </div>
-      `;
+        </div>`;
     });
+
     html += '</div>';
     ordersContainer.innerHTML = html;
 
   } catch (err) {
+    console.error("Order Load Error:", err);
     ordersContainer.innerHTML = "<p>Error loading orders.</p>";
   }
 }
