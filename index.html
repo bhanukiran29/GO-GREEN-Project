@@ -9,16 +9,16 @@
   <!-- Bootstrap 3 CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 
-  <!-- Your CSS (replace style.css with the one below) -->
+  <!-- Your CSS -->
   <link rel="stylesheet" href="style.css">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
   <script src="script.js"></script>
+  <script src="search_logic.js"></script>
 </head>
 
 <body>
-
 
   <nav class="navbar custom-navbar">
     <div class="container-fluid navbar-flex">
@@ -28,13 +28,15 @@
         <img src="http://clipart-library.com/image_gallery/n1312278.jpg" class="logo-img">
       </div>
 
-      <!-- Location Dropdown -->
+      <!-- Location Box (Dropdown Trigger) -->
       <div class="dropdown location-dropdown hidden-xs">
-        <button class="btn dropdown-toggle location-btn" type="button" data-toggle="dropdown">
-          <span class="glyphicon glyphicon-map-marker"></span>
-          <span id="selected-location">Select Location</span>
-          <span class="caret"></span>
-        </button>
+        <div class="location-box dropdown-toggle" data-toggle="dropdown" style="cursor:pointer;">
+          <span class="glyphicon glyphicon-map-marker loc-icon"></span>
+          <div class="loc-text">
+            <small>Delivering to</small><br>
+            <strong id="selected-location">Update location</strong>
+          </div>
+        </div>
 
         <ul class="dropdown-menu location-menu">
           <li><a href="#" onclick="setLocation('Hyderabad')">Hyderabad</a></li>
@@ -46,7 +48,7 @@
       </div>
 
       <!-- Search Bar -->
-      <form class="navbar-form navbar-left search-area">
+      <form class="navbar-form navbar-left search-area" onsubmit="return false;">
         <div class="input-group search-box">
           <span class="input-group-addon search-icon">
             <span class="glyphicon glyphicon-search"></span>
@@ -63,42 +65,48 @@
         <li><a href="about.html">About</a></li>
       </ul>
 
-
-
-
       <!-- User menu (shows after login) -->
-      <li class="dropdown user-menu" id="userMenu" style="display:none;">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-          aria-expanded="false">
-          <span class="avatar-circle" id="navAvatar">U</span> <!-- avatar -->
-          <span class="glyphicon glyphicon-option-vertical"></span>
-        </a>
+      <ul class="nav navbar-nav navbar-right" id="userMenu" style="display:none;">
+        <li class="dropdown user-menu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+            aria-expanded="false">
+            <span class="avatar-circle" id="navAvatar">U</span>
+            <span class="glyphicon glyphicon-option-vertical"></span>
+          </a>
 
-        <ul class="dropdown-menu dropdown-menu-right user-dropdown">
-          <li class="dropdown-header user-header">
-            <div class="user-meta">
-              <span class="avatar-circle-lg" id="menuAvatar">U</span>
-              <div class="user-info">
-                <strong id="menuUserName">User Name</strong><br>
-                <small id="menuUserEmail">email@example.com</small>
+          <ul class="dropdown-menu dropdown-menu-right user-dropdown">
+            <li class="dropdown-header user-header">
+              <div class="user-meta">
+                <span class="avatar-circle-lg" id="menuAvatar">U</span>
+                <div class="user-info">
+                  <strong id="menuUserName">User Name</strong><br>
+                  <small id="menuUserEmail">email@example.com</small>
+                </div>
               </div>
-            </div>
-          </li>
+            </li>
 
-          <li role="separator" class="divider"></li>
+            <li role="separator" class="divider"></li>
 
+<<<<<<< HEAD
+            <li><a href="profile.html"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
+            <li><a href="orders.html"><span class="glyphicon glyphicon-list-alt"></span> My Orders</a></li>
+            <li><a href="#" onclick="openEditProfileModal()" data-toggle="modal" data-target="#editProfileModal">
+                <span class="glyphicon glyphicon-edit"></span> Edit Profile</a>
+            </li>
+=======
           <li><a href="profile.html"><span class="glyphicon glyphicon-user"></span> Profile</a></li>
           <li><a href="orders.html"><span class="glyphicon glyphicon-list-alt"></span> My Orders</a></li>
           <li><a href="#" data-toggle="modal" data-target="#editProfileModal" onclick="openEditProfileModal()">
           <span class="glyphicon glyphicon-edit"></span> Edit Profile</a>
           </li>
+>>>>>>> 71ef4223fd95aa215fc30848ce9205cade3e54fd
 
-          <li role="separator" class="divider"></li>
+            <li role="separator" class="divider"></li>
 
-          <li><a href="#" onclick="logoutUser()"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
-        </ul>
-      </li>
-
+            <li><a href="#" onclick="logoutUser()"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+          </ul>
+        </li>
+      </ul>
 
     </div>
   </nav>
@@ -148,18 +156,14 @@
 </div>
 
 
-
-
-
-
-  <!-- full-width area -->
+  <!-- Carousel -->
   <div class="container-fluid" style="padding:0; margin:0;">
     <div id="myCarousel" class="carousel slide carousel-fix" data-ride="carousel">
       <!-- indicators -->
       <ol class="carousel-indicators">
         <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-        <li data-target="#myCarouse1" data-slide-to="1"></li>
-        <li data-target="#myCarouse1" data-slide-to="2"></li>
+        <li data-target="#myCarousel" data-slide-to="1"></li>
+        <li data-target="#myCarousel" data-slide-to="2"></li>
       </ol>
 
       <!-- slides -->
@@ -187,12 +191,7 @@
     </div>
   </div>
 
-
-
-  <!-- ========================= -->
-  <!-- 🌿 OUR CATEGORIES SECTION -->
-  <!-- ========================= -->
-
+  <!-- Our Products Section -->
   <h1 class="section-title"><span>🛍️</span> Our Products</h1>
 
   <div class="category-container">
@@ -230,29 +229,14 @@
     <!-- Category 6 -->
     <div class="category-card" onclick="location.href='Natural-Beauty.html'">
       <img src="iNatural Beauty Productss.jpg" alt="Natural Beauty Products">
-      <h3>Natutral Beauty Products</h3>
+      <h3>Natural Beauty Products</h3>
     </div>
 
   </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
   <footer class="site-footer">
     <p>© 2025 Go Green. All Rights Reserved.</p>
   </footer>
-
-
-
 
 </body>
 

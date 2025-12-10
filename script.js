@@ -241,6 +241,70 @@ async function openEditProfileModal() {
 
 
 async function saveProfileEdits() {
+<<<<<<< HEAD
+  const userId = getUserId();
+  if (!userId) return alert("Please login first.");
+
+  const name = (document.getElementById("editName") || {}).value.trim();
+  const email = (document.getElementById("editEmail") || {}).value.trim();
+  const phone = (document.getElementById("editPhone") || {}).value.trim();
+  const password = (document.getElementById("editPassword") || {}).value.trim();
+
+  if (!name || !email) {
+    alert("Name and email are required.");
+    return false;
+  }
+
+  // Check if email is changing (requires fetching current user data first if we want to be strict, 
+  // but for now we can just warn if the input email is different from session email)
+  const currentEmail = sessionStorage.getItem("userEmail");
+  if (currentEmail && email !== currentEmail) {
+    if (!confirm("Changing your email will require you to login again with the new email. Continue?")) {
+      return false;
+    }
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/auth/update`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        _id: userId,
+        name,
+        email,
+        phone,
+        password: password === "********" ? undefined : password
+      })
+    });
+    const data = await res.json();
+
+    if (res.ok) {
+      // Update session storage
+      sessionStorage.setItem("userName", data.user.name);
+      sessionStorage.setItem("userEmail", data.user.email);
+
+      // Update localStorage cache if it exists, otherwise just ignore
+      if (localStorage.getItem("userData")) {
+        localStorage.setItem("userData", JSON.stringify(data.user));
+      }
+
+      refreshUserMenu();
+
+      // Immediate UI update for profile page
+      if (document.getElementById("profileName")) document.getElementById("profileName").innerText = data.user.name;
+      if (document.getElementById("profileEmail")) document.getElementById("profileEmail").innerText = data.user.email;
+      if (document.getElementById("profilePhone")) document.getElementById("profilePhone").innerText = "📞 " + data.user.phone;
+      if (document.getElementById("detailName")) document.getElementById("detailName").innerText = data.user.name;
+      if (document.getElementById("detailEmail")) document.getElementById("detailEmail").innerText = data.user.email;
+      if (document.getElementById("detailPhone")) document.getElementById("detailPhone").innerText = data.user.phone;
+
+      if (window.jQuery) $('#editProfileModal').modal('hide');
+
+      if (currentEmail && email !== currentEmail) {
+        alert("Email updated! Please login with your new email.");
+        logoutUser();
+        return;
+=======
   const name = document.getElementById("editName").value.trim();
   const email = document.getElementById("editEmail").value.trim();
   const phone = document.getElementById("editPhone").value.trim();
@@ -270,6 +334,7 @@ async function saveProfileEdits() {
       if (!res.ok) {
           alert(data.message || "Failed to update profile");
           return;
+>>>>>>> 71ef4223fd95aa215fc30848ce9205cade3e54fd
       }
 
       alert("Profile updated!");
@@ -291,8 +356,15 @@ async function saveProfileEdits() {
      $("#editProfileModal").modal("hide");
 
   } catch (err) {
+<<<<<<< HEAD
+    console.error(err);
+    alert("Error connecting to server");
+  }
+  return false;
+=======
     console.error("Profile update secondary error:", err);
     // No alert – avoid false popup
+>>>>>>> 71ef4223fd95aa215fc30848ce9205cade3e54fd
 }
   
 
@@ -303,6 +375,20 @@ async function saveProfileEdits() {
 
 /* ---------- Profile page population ---------- */
 async function populateProfilePage() {
+<<<<<<< HEAD
+  const userId = getUserId();
+  if (!userId) {
+    // Not logged in
+    const ordersContainer = document.getElementById("ordersContainer");
+    if (ordersContainer) ordersContainer.innerHTML = "<p>Please login to view orders.</p>";
+    return;
+  }
+
+  // Fetch User Details from API
+  try {
+    const res = await fetch(`${API_URL}/auth/user/${userId}`);
+    const user = await res.json();
+=======
   const userId = sessionStorage.getItem("userId");
 if (!userId) {
     alert("You are not logged in");
@@ -317,28 +403,38 @@ if (!userId) {
   const email = user.email || "";
   const phone = user.phone || "Not provided";
   const initial = (name.trim().charAt(0) || "U").toUpperCase();
+>>>>>>> 71ef4223fd95aa215fc30848ce9205cade3e54fd
 
-  // Populate User Details
-  if (document.getElementById("profileAvatar")) document.getElementById("profileAvatar").innerText = initial;
-  if (document.getElementById("profileName")) document.getElementById("profileName").innerText = name;
-  if (document.getElementById("profileEmail")) document.getElementById("profileEmail").innerText = email;
-  if (document.getElementById("profilePhone")) document.getElementById("profilePhone").innerText = "📞 " + phone;
+    if (!res.ok) {
+      console.error("Error fetching user:", user);
+      return;
+    }
 
-  if (document.getElementById("detailName")) document.getElementById("detailName").innerText = name;
-  if (document.getElementById("detailEmail")) document.getElementById("detailEmail").innerText = email;
-  if (document.getElementById("detailPhone")) document.getElementById("detailPhone").innerText = phone;
+    const name = user.name || "User";
+    const email = user.email || "";
+    const phone = user.phone || "Not provided";
+    const initial = (name.trim().charAt(0) || "U").toUpperCase();
+
+    // Populate User Details
+    if (document.getElementById("profileAvatar")) document.getElementById("profileAvatar").innerText = initial;
+    if (document.getElementById("profileName")) document.getElementById("profileName").innerText = name;
+    if (document.getElementById("profileEmail")) document.getElementById("profileEmail").innerText = email;
+    if (document.getElementById("profilePhone")) document.getElementById("profilePhone").innerText = "📞 " + phone;
+
+    if (document.getElementById("detailName")) document.getElementById("detailName").innerText = name;
+    if (document.getElementById("detailEmail")) document.getElementById("detailEmail").innerText = email;
+    if (document.getElementById("detailPhone")) document.getElementById("detailPhone").innerText = phone;
+
+  } catch (err) {
+    console.error("Error loading profile data:", err);
+  }
 
   // Fetch and Populate Orders
   const ordersContainer = document.getElementById("ordersContainer");
   if (!ordersContainer) return;
 
-  if (!user._id) {
-    ordersContainer.innerHTML = "<p>Please login to view orders.</p>";
-    return;
-  }
-
   try {
-    const res = await fetch(`${API_URL}/orders/${user._id}`);
+    const res = await fetch(`${API_URL}/orders/${userId}`);
     const orders = await res.json();
 
     if (!res.ok || !orders.length) {
