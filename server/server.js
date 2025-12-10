@@ -1,3 +1,4 @@
+// mongodb+srv://srideviddcs25_db_user:Sridevi072006@goreencluster.nw6mq2s.mongodb.net/?retryWrites=true&w=majority&appName=GoreenCluster
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');

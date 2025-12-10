@@ -94,11 +94,36 @@
         .buy-btn:hover {
             background: #1a4b35;
         }
+
+          .back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: #0a6b3f;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    transition: 0.2s ease-in-out;
+}
+.back-btn:hover {
+    background: #084d2d;
+    transform: translateY(-4px);
+}
     </style>
 </head>
 
 <body>
-
+     <div class="back-btn" onclick="history.back()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+    </div>
     <div class="container">
 
         <h1>Clay Pots</h1>
@@ -160,28 +185,7 @@
     
 <script src="script.js"></script>
 
-<script>
-function buyNow(name, price, img) {
-    // Save only this 1 product for direct purchase
-    const directOrder = [{
-        name: name,
-        price: price,
-        img: img,
-        quantity: 1
-    }];
 
-    // Save to localStorage
-    localStorage.setItem("directBuyItem", JSON.stringify(directOrder));
-
-    // Redirect to checkout form (order form page)
-    window.location.href = "order-form.html";
-}
-
-
-
-
-        
-</script>
 
 </body>
 </html>
