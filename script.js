@@ -11,8 +11,8 @@
 const API_URL = "http://localhost:5002/api";
 
 /* ---------- Utilities ---------- */
-function $(sel) { return document.querySelector(sel); }
-function $all(sel) { return Array.from(document.querySelectorAll(sel)); }
+function qs(sel) { return document.querySelector(sel); }
+function qsAll(sel) { return Array.from(document.querySelectorAll(sel)); }
 
 /* ---------- Session Management ---------- */
 function getUserId() {
@@ -79,6 +79,8 @@ async function loadUserLocation() {
     console.error("Error loading location:", err);
   }
 }
+
+
 
 /* ---------- ACCOUNT: Signup & Login ---------- */
 

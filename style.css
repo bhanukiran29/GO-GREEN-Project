@@ -100,13 +100,14 @@ body {
 
 .custom-navbar {
   background: #d8f3dc;
-  /* soft light green */
   height: 90px;
   padding: 10px 15px;
   border: none;
   border-radius: 0;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;  /* FIXED — keep navbar above but allow dropdown */
 }
+
 
 .navbar-flex {
   display: flex;
@@ -184,9 +185,12 @@ body {
 .search-box {
   width: 100%;
   border-radius: 10px;
-  overflow: hidden;
   background: #ffffff;
+  overflow: visible;     /* IMPORTANT */
+  position: relative;    /* REQUIRED */
+  z-index: 9999;         /* REQUIRED */
 }
+
 
 .search-icon {
   background: #ffffff;
