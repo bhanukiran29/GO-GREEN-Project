@@ -1,198 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>My Orders</title>
-<style>
-    body {
-        background: #e6ffe6;
-        font-family: Arial, sans-serif;
-        padding: 40px;
-    }
+    <meta charset="UTF-8">
+    <title>My Orders</title>
+    <style>
+        body {
+            background: #e6ffe6;
+            font-family: Arial, sans-serif;
+            padding: 40px;
+        }
 
-    .orders-box {
-        background: white;
-        padding: 30px;
-        max-width: 1000px;
-        margin: auto;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+        .orders-box {
+            background: white;
+            padding: 30px;
+            max-width: 1000px;
+            margin: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
 
-    h1 {
-        color: #1b4332;
-        font-size: 32px;
-    }
+        h1 {
+            color: #1b4332;
+            font-size: 32px;
+        }
 
-    .order-card {
-        border-bottom: 1px solid #ccc;
-        padding: 20px 0;
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
+        .order-card {
+            border-bottom: 1px solid #ccc;
+            padding: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
 
-    .order-card img {
-        width: 80px;
-        height: 80px;
-        object-fit: cover;
-        border-radius: 8px;
-        background: #eee;
-    }
+        .order-card img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #eee;
+        }
 
-    .order-details {
-        flex-grow: 1;
-    }
+        .order-details {
+            flex-grow: 1;
+        }
 
-    .order-date {
-        color: #2d6a4f;
-        font-size: 14px;
-        margin-top: 4px;
-    }
+        .order-date {
+            color: #2d6a4f;
+            font-size: 14px;
+            margin-top: 4px;
+        }
 
-    .empty {
-        color: #666;
-        text-align: center;
-        padding: 30px;
-        font-size: 18px;
-    }
+        .empty {
+            color: #666;
+            text-align: center;
+            padding: 30px;
+            font-size: 18px;
+        }
 
-    .btn {
-        display: inline-block;
-        padding: 10px 20px;
-        background: #1b4332;
-        color: white;
-        border-radius: 6px;
-        text-decoration: none;
-        font-size: 16px;
-        margin-top: 20px;
-    }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #1b4332;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 16px;
+            margin-top: 20px;
+        }
 
-    .order-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #ffffff;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 18px;
-    box-shadow: 0 2px 7px rgba(0,0,0,0.07);
-}
+        .order-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 7px rgba(0, 0, 0, 0.07);
+        }
 
-.order-item {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
+        .order-item {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
 
-.order-item img {
-    width: 80px;
-    height: 80px;
-    border-radius: 8px;
-    object-fit: cover;
-}
+        .order-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
 
-.details h3 {
-    margin: 0;
-    font-size: 18px;
-}
+        .details h3 {
+            margin: 0;
+            font-size: 18px;
+        }
 
-.details p {
-    margin: 4px 0;
-    font-size: 14px;
-}
+        .details p {
+            margin: 4px 0;
+            font-size: 14px;
+        }
 
-.cancelBtn {
-    background: #c62828;
-    color: #fff;
-    padding: 8px 14px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    white-space: nowrap;
-}
+        .cancelBtn {
+            background: #c62828;
+            color: #fff;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
 
-.cancelBtn:hover {
-    background: #a61e1e;
-}
+        .cancelBtn:hover {
+            background: #a61e1e;
+        }
 
-hr {
-    display: none; /* remove extra line under each card */
-}
-  .back-btn {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: #0a6b3f;
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 1000;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-    transition: 0.2s ease-in-out;
-}
-.back-btn:hover {
-    background: #084d2d;
-    transform: translateY(-4px);
-}
+        hr {
+            display: none;
+            /* remove extra line under each card */
+        }
 
-</style>
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #0a6b3f;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            transition: 0.2s ease-in-out;
+        }
+
+        .back-btn:hover {
+            background: #084d2d;
+            transform: translateY(-4px);
+        }
+    </style>
 </head>
+
 <body>
-     <div class="back-btn" onclick="history.back()">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"></polyline>
-    </svg>
+    <div class="back-btn" onclick="history.back()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
     </div>
-<div class="orders-box">
-    <h1>My Orders</h1>
-    <div id="ordersContainer"></div>
-    <a href="index.html" class="btn">Back to Home</a>
-</div>
-<script>
-const API_URL = "http://localhost:5002/api";
-const userId = sessionStorage.getItem("userId");
-const ordersContainer = document.getElementById("ordersContainer");
+    <div class="orders-box">
+        <h1>My Orders</h1>
+        <div id="ordersContainer"></div>
+        <a href="index.html" class="btn">Back to Home</a>
+    </div>
+    <script>
+        const API_URL = "http://localhost:5002/api";
+        const userId = sessionStorage.getItem("userId");
+        const ordersContainer = document.getElementById("ordersContainer");
 
-// Load Orders from Backend
-async function loadOrders() {
-    if (!userId) {
-        ordersContainer.innerHTML = `<p class="empty">Please login to view your orders.</p>`;
-        return;
-    }
+        // Load Orders from Backend
+        async function loadOrders() {
+            if (!userId) {
+                ordersContainer.innerHTML = `<p class="empty">Please login to view your orders.</p>`;
+                return;
+            }
 
-    const res = await fetch(`${API_URL}/orders/${userId}`);
-    const orders = await res.json();
+            const res = await fetch(`${API_URL}/orders/${userId}`);
+            const orders = await res.json();
 
-    if (!orders.length) {
-        ordersContainer.innerHTML = `<p class="empty">No orders found.</p>`;
-        return;
-    }
+            if (!orders.length) {
+                ordersContainer.innerHTML = `<p class="empty">No orders found.</p>`;
+                return;
+            }
 
-    ordersContainer.innerHTML = ""; // clear existing
+            ordersContainer.innerHTML = ""; // clear existing
 
-    orders.reverse().forEach(order => {
-        const orderId = order._id;
-        const orderDate = new Date(order.date).toLocaleDateString();
+            orders.reverse().forEach(order => {
+                const orderId = order._id;
+                const orderDateObj = new Date(order.date);
+                const orderDate = orderDateObj.toLocaleDateString();
 
-        order.items.forEach(item => {
-            const qty = item.qty || 1;
-            const totalPrice = item.price * qty;
+                // Use saved deliveryDate or calculate one for old orders (random 2-7 days after order)
+                let deliveryText = order.deliveryDate;
+                if (!deliveryText) {
+                    // Generate a consistent pseudo-random number based on orderId characters
+                    // This ensures the date doesn't change on every refresh for the same order
+                    let seed = 0;
+                    if (orderId) {
+                        for (let i = 0; i < orderId.length; i++) {
+                            seed += orderId.charCodeAt(i);
+                        }
+                    }
+                    const randomDays = (seed % 6) + 2; // (0 to 5) + 2 = 2 to 7 days
 
-            const card = document.createElement("div");
-            card.className = "order-card";
+                    const estDate = new Date(orderDateObj);
+                    estDate.setDate(estDate.getDate() + randomDays);
+                    deliveryText = estDate.toDateString();
+                }
 
-            card.innerHTML = `
+                order.items.forEach(item => {
+                    const qty = item.qty || 1;
+                    const totalPrice = item.price * qty;
+
+                    const card = document.createElement("div");
+                    card.className = "order-card";
+
+                    card.innerHTML = `
                 <div class="order-item">
                     <img src="${item.img}" alt="${item.name}">
                     <div class="details">
                         <h3>${item.name}</h3>
                         <p>₹${item.price} × ${qty} = <strong>₹${totalPrice}</strong></p>
-                        <small>Ordered on: ${orderDate}</small>
+                        <small style="color: #555;">Ordered on: ${orderDate}</small><br>
+                        <strong style="color: #2d6a4f; font-size: 13px;">🚚 Expected Delivery: ${deliveryText}</strong>
                     </div>
                 </div>
 
@@ -202,33 +227,34 @@ async function loadOrders() {
                 <hr>
             `;
 
-            ordersContainer.appendChild(card);
-        });
-    });
-}
+                    ordersContainer.appendChild(card);
+                });
+            });
+        }
 
-// Cancel Order from backend
-async function cancelOrder(orderId) {
-    if (!confirm("Are you sure you want to cancel this order?")) return;
+        // Cancel Order from backend
+        async function cancelOrder(orderId) {
+            if (!confirm("Are you sure you want to cancel this order?")) return;
 
-    const res = await fetch(`${API_URL}/orders/${orderId}`, {
-        method: "DELETE"
-    });
+            const res = await fetch(`${API_URL}/orders/${orderId}`, {
+                method: "DELETE"
+            });
 
-    if (!res.ok) {
-        alert("Order cancellation failed!");
-        return;
-    }
+            if (!res.ok) {
+                alert("Order cancellation failed!");
+                return;
+            }
 
-    alert("Order cancelled successfully!");
-    loadOrders(); // Refresh after deletion
-}
+            alert("Order cancelled successfully!");
+            loadOrders(); // Refresh after deletion
+        }
 
-// Load when page opens
-loadOrders();
-</script>
+        // Load when page opens
+        loadOrders();
+    </script>
 
 
 
 </body>
+
 </html>

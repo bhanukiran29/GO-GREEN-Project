@@ -14,6 +14,19 @@ const API_URL = "http://localhost:5002/api";
 function qs(sel) { return document.querySelector(sel); }
 function qsAll(sel) { return Array.from(document.querySelectorAll(sel)); }
 
+/* ---------- Validation Helpers ---------- */
+function validatePhone(phone) {
+  // 10 digits, optional +91 or 0
+  const re = /^(?:\+91|0)?[6-9]\d{9}$/;
+  return re.test(phone);
+}
+
+function validatePassword(password) {
+  // Min 8 chars, at least 1 number, 1 special char
+  const re = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
+  return re.test(password);
+}
+
 /* ---------- Session Management ---------- */
 function getUserId() {
   return sessionStorage.getItem("userId");
@@ -95,6 +108,17 @@ async function createAccount() {
     return;
   }
 
+
+  if (!validatePhone(phone)) {
+    alert("Invalid Phone Number! Please enter a valid 10-digit mobile number.");
+    return;
+  }
+
+  if (!validatePassword(password)) {
+    alert("Weak Password! Must be at least 8 chars long with 1 number and 1 special character.");
+    return;
+  }
+
   try {
     const res = await fetch(`${API_URL}/auth/signup`, {
       method: "POST",
@@ -105,6 +129,12 @@ async function createAccount() {
 
     if (res.ok) {
       alert("Account created successfully! Please login.");
+      // Clear form
+      document.getElementById("signupName").value = "";
+      document.getElementById("signupEmail").value = "";
+      document.getElementById("signupPhone").value = "";
+      document.getElementById("signupPassword").value = "";
+
       if (document.getElementById("loginForm") && document.getElementById("signupForm")) {
         document.getElementById("signupForm").style.display = "none";
         document.getElementById("loginForm").style.display = "block";
@@ -166,7 +196,7 @@ async function refreshUserMenu() {
   // User is logged in
   if (loginLinkEl) loginLinkEl.style.display = "none";
 
-  
+
   const userId = getUserId();
 
   // Fetch fresh data from backend
@@ -210,34 +240,34 @@ function logoutUser() {
 /* ---------- Edit Profile Modal handlers ---------- */
 
 async function openEditProfileModal() {
-    const userId = sessionStorage.getItem("userId");
-    if (!userId) {
-        alert("You are not logged in");
-        return;
+  const userId = sessionStorage.getItem("userId");
+  if (!userId) {
+    alert("You are not logged in");
+    return;
+  }
+
+  try {
+    // Fetch fresh backend user data
+    const res = await fetch(`${API_URL}/auth/user/${userId}`);
+    const user = await res.json();
+
+    if (!res.ok || !user || !user.name) {
+      console.error("Failed to load user:", user);
+      return; // REMOVE alert popup
     }
 
-    try {
-        // Fetch fresh backend user data
-        const res = await fetch(`${API_URL}/auth/user/${userId}`);
-        const user = await res.json();
+    // Fill modal fields
+    document.getElementById("editName").value = user.name || "";
+    document.getElementById("editEmail").value = user.email || "";
+    document.getElementById("editPhone").value = user.phone || "";
+    document.getElementById("editPassword").value = "********";
 
-        if (!res.ok || !user || !user.name) {
-            console.error("Failed to load user:", user);
-            return; // REMOVE alert popup
-        }
 
-        // Fill modal fields
-        document.getElementById("editName").value = user.name || "";
-        document.getElementById("editEmail").value = user.email || "";
-        document.getElementById("editPhone").value = user.phone || "";
-        document.getElementById("editPassword").value = "********";
 
-       
-
-    } catch (err) {
-        console.error("Error fetching edit profile data:", err);
-        // NO alert here – avoid showing popup
-    }
+  } catch (err) {
+    console.error("Error fetching edit profile data:", err);
+    // NO alert here – avoid showing popup
+  }
 }
 
 
@@ -571,36 +601,36 @@ async function removeItem(productId) {
 }
 // //  updated
 async function checkout() {
-    const userId = getUserId();
-    if (!userId) {
-        alert("Please login to checkout.");
-        return window.location.href = "login.html";
+  const userId = getUserId();
+  if (!userId) {
+    alert("Please login to checkout.");
+    return window.location.href = "login.html";
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/checkout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId,
+        address: JSON.parse(localStorage.getItem("selectedAddress")) || null
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.message || "Checkout failed.");
+      return;
     }
 
-    try {
-        const res = await fetch(`${API_URL}/checkout`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userId,
-                address: JSON.parse(localStorage.getItem("selectedAddress")) || null
-            })
-        });
+    // Redirect with orderId
+    window.location.href = "order-success.html?orderId=" + data.orderId;
 
-        const data = await res.json();
-
-        if (!res.ok) {
-            alert(data.message || "Checkout failed.");
-            return;
-        }
-
-        // Redirect with orderId
-        window.location.href = "order-success.html?orderId=" + data.orderId;
-
-    } catch (err) {
-        console.error("Checkout error:", err);
-        alert("Server error");
-    }
+  } catch (err) {
+    console.error("Checkout error:", err);
+    alert("Server error");
+  }
 }
 
 
@@ -646,67 +676,67 @@ document.addEventListener("DOMContentLoaded", function () {
 /* ---------- BUY NOW (Single Product Checkout) ---------- */
 /* BUY NOW from Product Page */
 function buyNow(name, price, img) {
-    const userId = getUserId();
-    if (!userId) {
-        alert("Please login");
-        window.location.href = "login.html";
-        return;
-    }
+  const userId = getUserId();
+  if (!userId) {
+    alert("Please login");
+    window.location.href = "login.html";
+    return;
+  }
 
-    localStorage.setItem("checkoutMode", "single");
-    localStorage.setItem("checkoutSingle", JSON.stringify({
-        name,
-        price,
-        img,
-        qty: 1
-    }));
+  localStorage.setItem("checkoutMode", "single");
+  localStorage.setItem("checkoutSingle", JSON.stringify({
+    name,
+    price,
+    img,
+    qty: 1
+  }));
 
-    window.location.href = "checkout.html";
+  window.location.href = "checkout.html";
 }
 
 /* BUY NOW from Cart Page */
 function buyNowItem(productId) {
-    // we are buying from CART, so ignore any previous product-page Buy Now
-    localStorage.setItem("checkoutMode", "single");
-    localStorage.removeItem("checkoutSingle");          // 👈 important
-    localStorage.setItem("checkoutSingleProductId", productId);
+  // we are buying from CART, so ignore any previous product-page Buy Now
+  localStorage.setItem("checkoutMode", "single");
+  localStorage.removeItem("checkoutSingle");          // 👈 important
+  localStorage.setItem("checkoutSingleProductId", productId);
 
-    window.location.href = "checkout.html";
+  window.location.href = "checkout.html";
 }
 
 
 /* BUY ALL from Cart Page */
 function buyNowAll() {
-    localStorage.setItem("checkoutMode", "cart");
-    localStorage.removeItem("checkoutSingle");
-    localStorage.removeItem("checkoutSingleProductId");
-    window.location.href = "checkout.html";
+  localStorage.setItem("checkoutMode", "cart");
+  localStorage.removeItem("checkoutSingle");
+  localStorage.removeItem("checkoutSingleProductId");
+  window.location.href = "checkout.html";
 }
 
 /* CHECKOUT PAGE LOADER */
 document.addEventListener("DOMContentLoaded", async () => {
-    if (!window.location.pathname.includes("checkout.html")) return;
+  if (!window.location.pathname.includes("checkout.html")) return;
 
-    const userId = getUserId();
-    const mode = localStorage.getItem("checkoutMode");
-    const orderBox = document.getElementById("orderDetails");
-    const totalBox = document.getElementById("grandTotal");
+  const userId = getUserId();
+  const mode = localStorage.getItem("checkoutMode");
+  const orderBox = document.getElementById("orderDetails");
+  const totalBox = document.getElementById("grandTotal");
 
-    console.log("Checkout mode:", mode);
+  console.log("Checkout mode:", mode);
 
-    if (mode === "single") {
-        let item = JSON.parse(localStorage.getItem("checkoutSingle"));
-        if (!item) {
-            const pid = localStorage.getItem("checkoutSingleProductId");
-            const res = await fetch(`${API_URL}/cart/${userId}`);
-            const data = await res.json();
-            item = data.items.find(i => i.productId === pid);
-        }
+  if (mode === "single") {
+    let item = JSON.parse(localStorage.getItem("checkoutSingle"));
+    if (!item) {
+      const pid = localStorage.getItem("checkoutSingleProductId");
+      const res = await fetch(`${API_URL}/cart/${userId}`);
+      const data = await res.json();
+      item = data.items.find(i => i.productId === pid);
+    }
 
-        if (!item) return orderBox.innerHTML = `<p>No product selected.</p>`;
+    if (!item) return orderBox.innerHTML = `<p>No product selected.</p>`;
 
-        const subtotal = item.price * (item.qty || 1);
-        orderBox.innerHTML = `
+    const subtotal = item.price * (item.qty || 1);
+    orderBox.innerHTML = `
             <div class="item-row">
                 <img src="${item.img}">
                 <div class="item-info">
@@ -714,22 +744,22 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <p>₹${item.price} × ${item.qty || 1} = ₹${subtotal}</p>
                 </div>
             </div>`;
-        totalBox.innerText = "₹" + subtotal;
-        return;
-    }
+    totalBox.innerText = "₹" + subtotal;
+    return;
+  }
 
-    if (mode === "cart") {
-        const res = await fetch(`${API_URL}/cart/${userId}`);
-        const data = await res.json();
-        const cart = data.items;
+  if (mode === "cart") {
+    const res = await fetch(`${API_URL}/cart/${userId}`);
+    const data = await res.json();
+    const cart = data.items;
 
-        let html = "";
-        let total = 0;
+    let html = "";
+    let total = 0;
 
-        cart.forEach(item => {
-            const qty = item.qty || 1;
-            const subtotal = item.price * qty;
-            html += `
+    cart.forEach(item => {
+      const qty = item.qty || 1;
+      const subtotal = item.price * qty;
+      html += `
             <div class="item-row">
                 <img src="${item.img}">
                 <div class="item-info">
@@ -737,86 +767,133 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <p>₹${item.price} × ${qty} = ₹${subtotal}</p>
                 </div>
             </div>`;
-            total += subtotal;
-        });
+      total += subtotal;
+    });
 
-        orderBox.innerHTML = html;
-        totalBox.innerText = "₹" + total;
-    }
+    orderBox.innerHTML = html;
+    totalBox.innerText = "₹" + total;
+  }
+
+  // Calculate Delivery Date (current date + 3 days)
+  const today = new Date();
+  today.setDate(today.getDate() + 3);
+  const dateStr = today.toDateString();
+
+  const deliveryEl = document.getElementById("deliveryDate");
+  if (deliveryEl) {
+    deliveryEl.innerText = "Expected Delivery: " + dateStr;
+    deliveryEl.setAttribute("data-date", dateStr);
+  }
 });
 /* ===== PLACE ORDER FUNCTION ===== */
 async function placeOrder() {
-    const userId = getUserId();
-    if (!userId) return alert("Login first!");
+  const userId = getUserId();
+  if (!userId) return alert("Login first!");
 
-    const fullName = document.getElementById("name").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const state = document.getElementById("state").value.trim();
-    const district = document.getElementById("district").value.trim();
-    const city = document.getElementById("city").value.trim();
-    const street = document.getElementById("street").value.trim();
-    const pincode = document.getElementById("pincode").value.trim();
+  const fullName = document.getElementById("name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const state = document.getElementById("state").value.trim();
+  const district = document.getElementById("district").value.trim();
+  const city = document.getElementById("city").value.trim();
+  const street = document.getElementById("street").value.trim();
+  const pincode = document.getElementById("pincode").value.trim();
 
-    if (!fullName || !phone || !state || !district || !city || !street || !pincode) {
-        return alert("Please fill all delivery details!");
+  if (!fullName || !phone || !state || !district || !city || !street || !pincode) {
+    return alert("Please fill all delivery details!");
+  }
+
+  if (!validatePhone(phone)) {
+    return alert("Invalid Phone Number provided in delivery address!");
+  }
+
+  if (pincode.length !== 6 || isNaN(pincode)) {
+    return alert("Invalid Pincode! Must be 6 digits.");
+  }
+
+  const mode = localStorage.getItem("checkoutMode");
+  let items = [];
+
+  // 1. Try to get items from Backend Cart first
+  const resCart = await fetch(`${API_URL}/cart/${userId}`);
+  const cartData = await resCart.json();
+
+  if (mode === "single") {
+    // CASE A: Buy Now from Cart (passed via Product ID)
+    const pid = localStorage.getItem("checkoutSingleProductId");
+    if (pid) {
+      items = cartData.items.filter(i => i.productId === pid);
     }
 
-    const mode = localStorage.getItem("checkoutMode");
-    let items = [];
-
-    // ⭐ ALWAYS get product data from CART DB for reliability
-    const resCart = await fetch(`${API_URL}/cart/${userId}`);
-    const cartData = await resCart.json();
-
-    if (mode === "single") {
-        const pid = localStorage.getItem("checkoutSingleProductId");
-        if (pid) {
-            items = cartData.items.filter(i => i.productId === pid);
-        } else {
-            items = cartData.items; // fallback
+    // CASE B: Buy Now from Product Page (passed via localStorage JSON)
+    if (!items.length) {
+      const storedItem = localStorage.getItem("checkoutSingle");
+      if (storedItem) {
+        try {
+          const parsed = JSON.parse(storedItem);
+          // Construct a valid item object for backend
+          items = [{
+            productId: "direct_" + Date.now(), // direct buy, no permanent cart ID
+            name: parsed.name,
+            price: parsed.price,
+            img: parsed.img,
+            qty: parsed.qty || 1
+          }];
+        } catch (e) {
+          console.error("Error parsing checkoutSingle", e);
         }
-    } else {
-        items = cartData.items; // full cart buy
+      }
     }
+  } else {
+    items = cartData.items; // Full cart buy
+  }
 
-    if (!items.length) return alert("No items to order!");
+  if (!items.length) return alert("No items to order! Please try adding to cart again.");
 
-    const total = items.reduce((sum, item) => sum + (item.price * (item.qty || 1)), 0);
+  const total = items.reduce((sum, item) => sum + (item.price * (item.qty || 1)), 0);
 
-    const orderPayload = {
-        userId,
-        items,
-        total,
-        date: new Date(),
-        address: { fullName, phone, state, district, city, street, pincode }
-    };
+  // Get Payment Method
+  const paymentMethodEl = document.querySelector('input[name="payment"]:checked');
+  const paymentMethod = paymentMethodEl ? paymentMethodEl.value : "COD";
 
-    const res = await fetch(`${API_URL}/orders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderPayload)
+  // Get Delivery Date
+  const deliveryDate = document.getElementById("deliveryDate").getAttribute("data-date") || new Date().toDateString();
+
+  const orderPayload = {
+    userId,
+    items,
+    total,
+    date: new Date(),
+    deliveryDate,
+    paymentMethod,
+    address: { fullName, phone, state, district, city, street, pincode }
+  };
+
+  const res = await fetch(`${API_URL}/orders`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(orderPayload)
+  });
+
+  if (!res.ok) {
+    console.error("Order create error", await res.text());
+    return alert("Order failed!");
+  }
+
+  // Clear only purchased items
+  if (mode === "single") {
+    const pid = localStorage.getItem("checkoutSingleProductId");
+    await fetch(`${API_URL}/cart/remove`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId, productId: pid })
     });
+  } else {
+    await fetch(`${API_URL}/cart/clear/${userId}`, { method: "DELETE" });
+  }
 
-    if (!res.ok) {
-        console.error("Order create error", await res.text());
-        return alert("Order failed!");
-    }
+  localStorage.removeItem("checkoutMode");
+  localStorage.removeItem("checkoutSingleProductId");
 
-    // Clear only purchased items
-    if (mode === "single") {
-        const pid = localStorage.getItem("checkoutSingleProductId");
-        await fetch(`${API_URL}/cart/remove`, {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, productId: pid })
-        });
-    } else {
-        await fetch(`${API_URL}/cart/clear/${userId}`, { method: "DELETE" });
-    }
-
-    localStorage.removeItem("checkoutMode");
-    localStorage.removeItem("checkoutSingleProductId");
-
-    alert("🎉 Order placed successfully!");
-    window.location.href = "orders.html";
+  alert("🎉 Order placed successfully!");
+  window.location.href = "orders.html";
 }

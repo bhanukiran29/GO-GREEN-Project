@@ -1,4 +1,5 @@
 // mongodb+srv://srideviddcs25_db_user:Sridevi072006@goreencluster.nw6mq2s.mongodb.net/?retryWrites=true&w=majority&appName=GoreenCluster
+//mongodb+srv://bhanukirancs24_db_user:BhanuKiran29@cluster01.1dk3rzc.mongodb.net/?appName=Cluster01
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -12,7 +13,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // MongoDB Connection
-mongoose.connect('mongodb+srv://srideviddcs25_db_user:Sridevi072006@goreencluster.nw6mq2s.mongodb.net/?retryWrites=true&w=majority&appName=GoreenCluster', {
+mongoose.connect('mongodb+srv://bhanukirancs24_db_user:BhanuKiran29@cluster01.1dk3rzc.mongodb.net/?appName=Cluster01', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => console.log('MongoDB Connected'))

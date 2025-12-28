@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Checkout</title>
@@ -23,7 +24,7 @@
             background: white;
             padding: 25px;
             border-radius: 14px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
         }
 
@@ -77,6 +78,39 @@
         }
 
         /* BUTTON */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1b4332;
+            margin-left: 5px;
+        }
+
+        .form-grid input,
+        .form-grid select {
+            padding: 12px;
+            border: 2px solid #e8f5e9;
+            border-radius: 10px;
+            font-size: 15px;
+            background: #fdfdfd;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .form-grid input:focus,
+        .form-grid select:focus {
+            border-color: #40916c;
+            background: #fff;
+            box-shadow: 0 4px 10px rgba(64, 145, 108, 0.1);
+            outline: none;
+        }
+
+        /* BUTTON */
         .btn-place {
             background: #1b6b3a;
             color: white;
@@ -107,66 +141,189 @@
             }
         }
 
-          .back-btn {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: #0a6b3f;
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 1000;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-    transition: 0.2s ease-in-out;
-}
-.back-btn:hover {
-    background: #084d2d;
-    transform: translateY(-4px);
-}
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #0a6b3f;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            transition: 0.2s ease-in-out;
+        }
+
+        .back-btn:hover {
+            background: #084d2d;
+            transform: translateY(-4px);
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 2px solid #e8f5e9;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .payment-option:hover {
+            background: #f1f8f5;
+            border-color: #40916c;
+        }
+
+        .payment-option input {
+            margin-right: 15px !important;
+            width: 20px !important;
+            height: 20px !important;
+        }
+
+        .payment-option span {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1b4332;
+        }
     </style>
 </head>
 
 <body>
- <div class="back-btn" onclick="history.back()">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"></polyline>
-    </svg>
+    <div class="back-btn" onclick="history.back()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
     </div>
-<div class="container">
+    <div class="container">
 
-    <!-- ORDER SUMMARY -->
-    <div class="card">
-        <div class="section-title">🛒 Order Summary</div>
-        <div id="orderDetails"></div>
+        <!-- ORDER SUMMARY -->
+        <div class="card">
+            <div class="section-title">🛒 Order Summary</div>
+            <div id="orderDetails"></div>
 
-        <div class="total-box">
-            Total: <span id="grandTotal">₹0</span>
-        </div>
-    </div>
-
-    <!-- DELIVERY ADDRESS -->
-    <div class="card">
-        <div class="section-title">📍 Delivery Address</div>
-
-        <div class="form-grid">
-            <input id="name" placeholder="Full Name">
-            <input id="phone" placeholder="Phone Number">
-            <input id="state" placeholder="State">
-            <input id="district" placeholder="District">
-            <input id="city" placeholder="City">
-            <input id="street" placeholder="Street">
-            <input id="pincode" placeholder="Pincode">
+            <div class="total-box">
+                Total: <span id="grandTotal">₹0</span>
+            </div>
         </div>
 
-        <button type="button" class="btn-place" onclick="placeOrder()">Place Order</button>
+        <!-- DELIVERY ADDRESS -->
+        <div class="card">
+            <div class="section-title">📍 Delivery Address</div>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input id="name" placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input id="phone" placeholder="9876543210" maxlength="10">
+                </div>
+
+                <div class="form-group">
+                    <label>State</label>
+                    <select id="state">
+                        <option value="" disabled selected>Select State</option>
+                        <option>Andhra Pradesh</option>
+                        <option>Arunachal Pradesh</option>
+                        <option>Assam</option>
+                        <option>Bihar</option>
+                        <option>Chhattisgarh</option>
+                        <option>Goa</option>
+                        <option>Gujarat</option>
+                        <option>Haryana</option>
+                        <option>Himachal Pradesh</option>
+                        <option>Jharkhand</option>
+                        <option>Karnataka</option>
+                        <option>Kerala</option>
+                        <option>Madhya Pradesh</option>
+                        <option>Maharashtra</option>
+                        <option>Manipur</option>
+                        <option>Meghalaya</option>
+                        <option>Mizoram</option>
+                        <option>Nagaland</option>
+                        <option>Odisha</option>
+                        <option>Punjab</option>
+                        <option>Rajasthan</option>
+                        <option>Sikkim</option>
+                        <option>Tamil Nadu</option>
+                        <option>Telangana</option>
+                        <option>Tripura</option>
+                        <option>Uttar Pradesh</option>
+                        <option>Uttarakhand</option>
+                        <option>West Bengal</option>
+                        <option>Andaman and Nicobar Islands</option>
+                        <option>Chandigarh</option>
+                        <option>Dadra and Nagar Haveli and Daman and Diu</option>
+                        <option>Delhi</option>
+                        <option>Lakshadweep</option>
+                        <option>Puducherry</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>District</label>
+                    <input id="district" placeholder="District Name">
+                </div>
+
+                <div class="form-group">
+                    <label>City / Town</label>
+                    <input id="city" placeholder="City Name">
+                </div>
+
+                <div class="form-group">
+                    <label>Street / Building</label>
+                    <input id="street" placeholder="H.No, Street, Area">
+                </div>
+
+                <div class="form-group">
+                    <label>Pincode</label>
+                    <input id="pincode" placeholder="6-digit Pincode" maxlength="6">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- PAYMENT METHOD -->
+        <div class="card">
+            <div class="section-title">💳 Payment Method</div>
+            <div class="payment-options">
+                <label class="payment-option">
+                    <input type="radio" name="payment" value="Card" checked>
+                    <span>Credit/Debit Card</span>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment" value="UPI">
+                    <span>UPI (GPay, PhonePe)</span>
+                </label>
+                <label class="payment-option">
+                    <input type="radio" name="payment" value="COD">
+                    <span>Cash on Delivery</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- DELIVERY ESTIMATE & ACTION -->
+        <div class="card" style="text-align: center;">
+            <div class="section-title">🚚 Expected Delivery</div>
+            <p id="deliveryDate" style="font-size: 18px; color: #2d6a4f; margin-bottom: 20px; font-weight: 500;">
+                Calculating...
+            </p>
+
+            <button type="button" class="btn-place" onclick="placeOrder()" style="width: 100%; max-width: 400px;">
+                Confirm & Place Order
+            </button>
+        </div>
+
     </div>
 
-</div>
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
+
 </html>
