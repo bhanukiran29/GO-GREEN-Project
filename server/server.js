@@ -4,13 +4,17 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path');
 
 const app = express();
-const PORT = 5002;
+const PORT = process.env.PORT || 5002;
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+
+// Serve static files from the root directory (one level up from server folder)
+app.use(express.static(path.join(__dirname, '../')));
 
 // MongoDB Connection
 mongoose.connect('mongodb+srv://bhanukirancs24_db_user:BhanuKiran29@cluster01.1dk3rzc.mongodb.net/?appName=Cluster01', {
@@ -412,20 +416,20 @@ app.post('/api/checkout', async (req, res) => {
         }
 
         // 5. Remove only purchased items from cart
-if (address?.productIds && Array.isArray(address.productIds)) {
-    // Remove only items that were purchased
-    cart.items = cart.items.filter(item => 
-        !address.productIds.includes(item.productId)
-    );
-} else {
-    console.log("Warning: No productIds received, cart not modified.");
-}
+        if (address?.productIds && Array.isArray(address.productIds)) {
+            // Remove only items that were purchased
+            cart.items = cart.items.filter(item =>
+                !address.productIds.includes(item.productId)
+            );
+        } else {
+            console.log("Warning: No productIds received, cart not modified.");
+        }
 
         await cart.save();
 
-        res.json({ 
-            message: "Checkout successful", 
-            orderId: newOrder._id 
+        res.json({
+            message: "Checkout successful",
+            orderId: newOrder._id
         });
 
     } catch (err) {
@@ -437,23 +441,32 @@ if (address?.productIds && Array.isArray(address.productIds)) {
 
 
 
+// Serve index.html for any unknown routes (Frontend catch-all)
+app.get('*', (req, res) => {
+    // Check if the request is for an API route
+    if (req.path.startsWith('/api')) {
+        return res.status(404).json({ error: 'API endpoint not found' });
+    }
+    // Otherwise serve the frontend
+    res.sendFile(path.join(__dirname, '../index.html'));
+});
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 // Get all orders of a user
 app.get('/api/orders/:userId', async (req, res) => {
-  const { userId } = req.params;
+    const { userId } = req.params;
 
-  try {
-    const orders = await ordersCollection.find({ userId }).toArray();
-    if (!orders.length) {
-      return res.json([]);
+    try {
+        const orders = await ordersCollection.find({ userId }).toArray();
+        if (!orders.length) {
+            return res.json([]);
+        }
+        res.json(orders);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to fetch orders" });
     }
-    res.json(orders);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to fetch orders" });
-  }
 });
 
 // delete order 

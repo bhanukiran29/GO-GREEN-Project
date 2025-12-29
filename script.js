@@ -8,7 +8,7 @@
    - Smooth scroll + helpers
    =========================== */
 
-const API_URL = "http://localhost:5002/api";
+const API_URL = "/api";
 
 /* ---------- Utilities ---------- */
 function qs(sel) { return document.querySelector(sel); }
