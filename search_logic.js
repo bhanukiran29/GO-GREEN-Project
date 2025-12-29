@@ -3,12 +3,12 @@
    ============================ */
 
 const PRODUCTS = [
-    { name: "Plants & Seeds", price: 150, img: "iplants_&_Seeds.jpeg", link: "plants&seeds.html" },
-    { name: "Soil & Fertilizers", price: 200, img: "isoil_&_fertilizer.jpg", link: "soil-&-Fertilizers.html" },
-    { name: "Pots & Planters", price: 300, img: "i212.jpg", link: "pots-&-Planters.html" },
-    { name: "Eco-Friendly Products", price: 180, img: "iEco-Friendly Products.jpg", link: "Eco_Friendly.html" },
-    { name: "Handmade Products", price: 250, img: "i226.jpg", link: "Handmade.html" },
-    { name: "Natural Beauty Products", price: 220, img: "iNatural Beauty Productss.jpg", link: "Natural-Beauty.html" }
+    { name: "Plants & Seeds", price: 150, img: "images/iplants_&_Seeds.jpeg", link: "plants&seeds.html" },
+    { name: "Soil & Fertilizers", price: 200, img: "images/isoil_&_fertilizer.jpg", link: "soil-&-Fertilizers.html" },
+    { name: "Pots & Planters", price: 300, img: "images/i212.jpg", link: "pots-&-Planters.html" },
+    { name: "Eco-Friendly Products", price: 180, img: "images/iEco-Friendly Products.jpg", link: "Eco_Friendly.html" },
+    { name: "Handmade Products", price: 250, img: "images/i226.jpg", link: "Handmade.html" },
+    { name: "Natural Beauty Products", price: 220, img: "images/iNatural Beauty Productss.jpg", link: "Natural-Beauty.html" }
 ];
 
 document.addEventListener("DOMContentLoaded", () => {

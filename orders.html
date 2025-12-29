@@ -207,12 +207,17 @@
                     const qty = item.qty || 1;
                     const totalPrice = item.price * qty;
 
+                    let imgSrc = item.img;
+                    if (!imgSrc.startsWith("images/") && !imgSrc.startsWith("http")) {
+                        imgSrc = "images/" + imgSrc;
+                    }
+
                     const card = document.createElement("div");
                     card.className = "order-card";
 
                     card.innerHTML = `
                 <div class="order-item">
-                    <img src="${item.img}" alt="${item.name}">
+                    <img src="${imgSrc}" alt="${item.name}">
                     <div class="details">
                         <h3>${item.name}</h3>
                         <p>₹${item.price} × ${qty} = <strong>₹${totalPrice}</strong></p>

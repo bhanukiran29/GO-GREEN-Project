@@ -440,7 +440,7 @@ async function _fetchCart() {
 }
 
 async function addToCart(name, price, img) {
-  console.log("addToCart called:", { name, price, img });
+
 
   const userId = getUserId();
   if (!userId) {
@@ -457,7 +457,7 @@ async function addToCart(name, price, img) {
       price: Number(price),
       img
     };
-    console.log("Sending to API:", payload);
+
 
     const res = await fetch(`${API_URL}/cart/add`, {
       method: "POST",
@@ -465,9 +465,9 @@ async function addToCart(name, price, img) {
       body: JSON.stringify(payload)
     });
 
-    console.log("Response status:", res.status);
+
     const data = await res.json();
-    console.log("Response data:", data);
+
 
     if (res.ok) {
       alert(name + " added to cart!");
@@ -722,7 +722,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const orderBox = document.getElementById("orderDetails");
   const totalBox = document.getElementById("grandTotal");
 
-  console.log("Checkout mode:", mode);
+
 
   if (mode === "single") {
     let item = JSON.parse(localStorage.getItem("checkoutSingle"));
@@ -738,7 +738,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const subtotal = item.price * (item.qty || 1);
     orderBox.innerHTML = `
             <div class="item-row">
-                <img src="${item.img}">
+                <img src="${(item.img && !item.img.startsWith('http') && !item.img.startsWith('images/')) ? 'images/' + item.img : item.img}">
                 <div class="item-info">
                     <h4>${item.name}</h4>
                     <p>₹${item.price} × ${item.qty || 1} = ₹${subtotal}</p>
@@ -761,7 +761,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const subtotal = item.price * qty;
       html += `
             <div class="item-row">
-                <img src="${item.img}">
+                <img src="${(item.img && !item.img.startsWith('http') && !item.img.startsWith('images/')) ? 'images/' + item.img : item.img}">
                 <div class="item-info">
                     <h4>${item.name}</h4>
                     <p>₹${item.price} × ${qty} = ₹${subtotal}</p>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Your Cart</title>
@@ -8,41 +9,76 @@
 
     <!-- Small inline tweaks to ensure green theme compatibility (optional) -->
     <style>
-        body { background: #e8f8e4; } /* subtle green background to match checkout */
-        .cart-container { margin-top: 40px; }
-        .action-btn { padding:10px 16px; border-radius:6px; cursor:pointer; border: none; }
-        .btn-buy-all { background:#1b6b3a; color:white; font-weight:600; }
-        .btn-remove { background:#d9534f; color:white; }
-        .btn-buy-now { background:#1b6b3a; color:white; }
-        .qty-btn { padding:6px 10px; border-radius:4px; background:#f0f0f0; border:1px solid #ddd; cursor:pointer; }
-          .back-btn {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: #0a6b3f;
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 1000;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-    transition: 0.2s ease-in-out;
-}
-.back-btn:hover {
-    background: #084d2d;
-    transform: translateY(-4px);
-}
+        body {
+            background: #e8f8e4;
+        }
+
+        /* subtle green background to match checkout */
+        .cart-container {
+            margin-top: 40px;
+        }
+
+        .action-btn {
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-buy-all {
+            background: #1b6b3a;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-remove {
+            background: #d9534f;
+            color: white;
+        }
+
+        .btn-buy-now {
+            background: #1b6b3a;
+            color: white;
+        }
+
+        .qty-btn {
+            padding: 6px 10px;
+            border-radius: 4px;
+            background: #f0f0f0;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #0a6b3f;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+            transition: 0.2s ease-in-out;
+        }
+
+        .back-btn:hover {
+            background: #084d2d;
+            transform: translateY(-4px);
+        }
     </style>
 </head>
 
 <body>
-     <div class="back-btn" onclick="history.back()">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"></polyline>
-    </svg>
+    <div class="back-btn" onclick="history.back()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"
+            stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
     </div>
     <div class="cart-page-wrapper cart-container">
         <div class="cart-header">
@@ -69,8 +105,9 @@
                     </div>
 
                     <div style="margin-top:18px;">
-                        <button id="buyAllBtn" class="checkout-button" style="background:#1b6b3a;border: none;color: #fff;"
-                                onclick="buyNowAll()">Buy All Now</button>
+                        <button id="buyAllBtn" class="checkout-button"
+                            style="background:#1b6b3a;border: none;color: #fff;" onclick="buyNowAll()">Buy All
+                            Now</button>
                     </div>
                 </div>
 
@@ -81,63 +118,68 @@
         </div>
     </div>
 
- <script>
-/* CONFIG */
-const API_URL = "http://localhost:5002/api";
+    <script>
+        /* CONFIG */
+        const API_URL = "http://localhost:5002/api";
 
-/* Helpers */
-function getUserId() {
-    return sessionStorage.getItem("userId");
-}
+        /* Helpers */
+        function getUserId() {
+            return sessionStorage.getItem("userId");
+        }
 
-/* Fetch cart from backend */
-async function getCart() {
-    const userId = getUserId();
-    if (!userId) return [];
+        /* Fetch cart from backend */
+        async function getCart() {
+            const userId = getUserId();
+            if (!userId) return [];
 
-    try {
-        const res = await fetch(`${API_URL}/cart/${userId}`);
-        const data = await res.json();
-        // backend returns { userId, items: [...] } or similar; adapt accordingly
-        return data.items || [];
-    } catch (err) {
-        console.error("Error fetching cart:", err);
-        return [];
-    }
-}
+            try {
+                const res = await fetch(`${API_URL}/cart/${userId}`);
+                const data = await res.json();
+                // backend returns { userId, items: [...] } or similar; adapt accordingly
+                return data.items || [];
+            } catch (err) {
+                console.error("Error fetching cart:", err);
+                return [];
+            }
+        }
 
-/* Render cart items */
-async function loadCart() {
-    const cart = await getCart();
-    const container = document.getElementById("cartItems");
-    const totalElement = document.getElementById("totalPrice");
-    const summaryCount = document.getElementById("summaryCount");
+        /* Render cart items */
+        async function loadCart() {
+            const cart = await getCart();
+            const container = document.getElementById("cartItems");
+            const totalElement = document.getElementById("totalPrice");
+            const summaryCount = document.getElementById("summaryCount");
 
-    if (!cart.length) {
-        container.innerHTML = `
+            if (!cart.length) {
+                container.innerHTML = `
             <div style="padding:20px;text-align:center;color:#666;">
                 Your cart is empty.
             </div>
         `;
-        totalElement.textContent = "₹0";
-        summaryCount.textContent = "0";
-        return;
-    }
+                totalElement.textContent = "₹0";
+                summaryCount.textContent = "0";
+                return;
+            }
 
-    let html = "";
-    let total = 0;
-    let count = 0;
+            let html = "";
+            let total = 0;
+            let count = 0;
 
-    cart.forEach((item) => {
-        const qty = item.qty || 1;
-        const subtotal = (item.price || 0) * qty;
-        total += subtotal;
-        count += qty;
+            cart.forEach((item) => {
+                const qty = item.qty || 1;
+                const subtotal = (item.price || 0) * qty;
+                total += subtotal;
+                count += qty;
 
-        html += `
+                let imgSrc = item.img || '';
+                if (imgSrc && !imgSrc.startsWith('images/') && !imgSrc.startsWith('http')) {
+                    imgSrc = 'images/' + imgSrc;
+                }
+
+                html += `
             <div class="cart-item">
                 <div class="item-image">
-                    <img src="${item.img || ''}" alt="${item.name || ''}" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">
+                    <img src="${imgSrc}" alt="${item.name || ''}" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">
                 </div>
 
                 <div class="item-details">
@@ -163,113 +205,114 @@ async function loadCart() {
                 </div>
             </div>
         `;
-    });
+            });
 
-    container.innerHTML = html;
-    totalElement.textContent = "₹" + total;
-    summaryCount.textContent = count;
-}
+            container.innerHTML = html;
+            totalElement.textContent = "₹" + total;
+            summaryCount.textContent = count;
+        }
 
-/* Quantity handlers */
-async function increaseQty(productId) {
-    const cart = await getCart();
-    const item = cart.find(i => i.productId === productId);
-    if (!item) return;
+        /* Quantity handlers */
+        async function increaseQty(productId) {
+            const cart = await getCart();
+            const item = cart.find(i => i.productId === productId);
+            if (!item) return;
 
-    const userId = getUserId();
-    if (!userId) return;
+            const userId = getUserId();
+            if (!userId) return;
 
-    try {
-        await fetch(`${API_URL}/cart/update`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userId,
-                productId,
-                qty: item.qty + 1
-            })
-        });
-        await loadCart();
-    } catch (err) {
-        console.error("Error updating quantity:", err);
-    }
-}
+            try {
+                await fetch(`${API_URL}/cart/update`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        userId,
+                        productId,
+                        qty: item.qty + 1
+                    })
+                });
+                await loadCart();
+            } catch (err) {
+                console.error("Error updating quantity:", err);
+            }
+        }
 
-async function decreaseQty(productId) {
-    const cart = await getCart();
-    const item = cart.find(i => i.productId === productId);
-    if (!item || item.qty <= 1) return;
+        async function decreaseQty(productId) {
+            const cart = await getCart();
+            const item = cart.find(i => i.productId === productId);
+            if (!item || item.qty <= 1) return;
 
-    const userId = getUserId();
-    if (!userId) return;
+            const userId = getUserId();
+            if (!userId) return;
 
-    try {
-        await fetch(`${API_URL}/cart/update`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userId,
-                productId,
-                qty: item.qty - 1
-            })
-        });
-        await loadCart();
-    } catch (err) {
-        console.error("Error updating quantity:", err);
-    }
-}
+            try {
+                await fetch(`${API_URL}/cart/update`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        userId,
+                        productId,
+                        qty: item.qty - 1
+                    })
+                });
+                await loadCart();
+            } catch (err) {
+                console.error("Error updating quantity:", err);
+            }
+        }
 
-/* Remove single item */
-async function removeItem(productId) {
-    const userId = getUserId();
-    if (!userId) return;
+        /* Remove single item */
+        async function removeItem(productId) {
+            const userId = getUserId();
+            if (!userId) return;
 
-    try {
-        await fetch(`${API_URL}/cart/remove`, {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userId,
-                productId
-            })
-        });
-        await loadCart();
-    } catch (err) {
-        console.error("Error removing item:", err);
-    }
-}
+            try {
+                await fetch(`${API_URL}/cart/remove`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        userId,
+                        productId
+                    })
+                });
+                await loadCart();
+            } catch (err) {
+                console.error("Error removing item:", err);
+            }
+        }
 
-/* Buy Now — single item from CART */
-async function buyNowItem(productId) {
-    // We are buying a single cart item, not the last product-page Buy Now
-    localStorage.setItem("checkoutMode", "single");
+        /* Buy Now — single item from CART */
+        async function buyNowItem(productId) {
+            // We are buying a single cart item, not the last product-page Buy Now
+            localStorage.setItem("checkoutMode", "single");
 
-    // Very important: clear any previous product-page Buy Now data
-    localStorage.removeItem("checkoutSingle");
+            // Very important: clear any previous product-page Buy Now data
+            localStorage.removeItem("checkoutSingle");
 
-    // Save ONLY this cart product id; checkout will use it to find item from cart
-    localStorage.setItem("checkoutSingleProductId", productId);
+            // Save ONLY this cart product id; checkout will use it to find item from cart
+            localStorage.setItem("checkoutSingleProductId", productId);
 
-    // Go to checkout
-    window.location.href = "checkout.html";
-}
+            // Go to checkout
+            window.location.href = "checkout.html";
+        }
 
-/* Buy All — all items from cart */
-async function buyNowAll() {
-    // Checkout should display all cart items
-    localStorage.setItem("checkoutMode", "cart");
+        /* Buy All — all items from cart */
+        async function buyNowAll() {
+            // Checkout should display all cart items
+            localStorage.setItem("checkoutMode", "cart");
 
-    // Clear any single-item data
-    localStorage.removeItem("checkoutSingle");
-    localStorage.removeItem("checkoutSingleProductId");
+            // Clear any single-item data
+            localStorage.removeItem("checkoutSingle");
+            localStorage.removeItem("checkoutSingleProductId");
 
-    window.location.href = "checkout.html";
-}
-
-
+            window.location.href = "checkout.html";
+        }
 
 
-document.addEventListener("DOMContentLoaded", loadCart);
-</script>    
+
+
+        document.addEventListener("DOMContentLoaded", loadCart);
+    </script>
 </body>
+
 </html>
