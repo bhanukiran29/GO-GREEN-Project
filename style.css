@@ -172,6 +172,14 @@ textarea:focus {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
   z-index: 1000;
+  transition: height 0.3s ease;
+}
+
+@media (max-width: 1200px) {
+  .navbar-links>li>a {
+    padding: 15px 10px !important;
+    font-size: 1.2rem;
+  }
 }
 
 .navbar-flex {
@@ -201,8 +209,23 @@ textarea:focus {
   padding: 10px 25px;
   /* Larger padding */
   color: #1b4332;
-  margin-right: 25px;
+  margin-right: 15px;
   transition: all 0.3s;
+}
+
+@media (max-width: 992px) {
+  .location-box {
+    padding: 8px 15px;
+    margin-right: 10px;
+  }
+
+  .loc-text small {
+    display: none;
+  }
+
+  .loc-text strong {
+    font-size: 1rem;
+  }
 }
 
 .location-box:hover {
@@ -226,8 +249,10 @@ textarea:focus {
 
 /* Search bar */
 .search-area {
-  width: 35%;
-  margin: 0 25px;
+  flex: 1;
+  max-width: 600px;
+  min-width: 200px;
+  margin: 0 15px;
 }
 
 .search-box {
@@ -521,20 +546,66 @@ body {
    RESPONSIVE
    ====================================================== */
 @media (max-width: 768px) {
+  .custom-navbar {
+    height: auto !important;
+    padding: 15px;
+  }
+
+  .navbar-flex {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .navbar-logo {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .logo-img {
+    height: 50px;
+  }
+
+  /* Hide location on mobile to save space, or style it smaller */
+  .location-dropdown {
+    display: none !important;
+  }
+
+  .search-area {
+    width: 100%;
+    margin: 5px 0;
+    order: 3;
+    /* Move search to bottom of header items */
+  }
+
+  .navbar-links {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 0 !important;
+    padding: 0 !important;
+    order: 4;
+  }
+
+  .navbar-links>li>a {
+    padding: 10px 15px !important;
+    font-size: 1.1rem;
+  }
+
+  /* User menu adjustments */
+  #userMenu {
+    margin: 0 auto;
+    float: none !important;
+    display: flex;
+    justify-content: center;
+  }
+
   h1 {
     font-size: 2.2rem;
   }
 
   .section-title {
     font-size: 1.8rem;
-  }
-
-  .search-area {
-    width: 100%;
-    margin: 10px 0;
-  }
-
-  .navbar-flex {
-    flex-wrap: wrap;
   }
 }
